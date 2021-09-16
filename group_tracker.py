@@ -12,8 +12,15 @@ DATA = None
 
 folder_path = os.path.dirname(os.path.realpath(__file__))
 
-with open(DB_FILENAME, 'r') as f:
-    DATA = json.load(f)
+def load_data():
+    global DATA
+    try:
+        with open(DB_FILENAME, 'r') as f:
+            DATA = json.load(f)
+    except FileNotFoundError:
+        DATA = {"PEOPLE": {}}
+        save_data()
+        load_data()
 
 def save_data():
     '''
@@ -37,9 +44,9 @@ WINDOW_TITLE = 'Group Tracker'
 
 
 button_options = {
-    'size': (20, 5),
+    'size': (20, 1.5),
     'font': 'arial 20 bold',
-    'pad': 50,
+    'pad': (50, 10),
 }
 
 submit_button_options = {
@@ -80,8 +87,19 @@ def home_window():
         [sg.Text('Welcome to Group Tracker!', **header_text_options)],
         [sg.Button(ADD_GROUP, **button_options)],
         [sg.Button(CREATE_REPORT, **button_options)],
+        [sg.Button('Quit', **button_options)],
     ]
     return sg.Window(WINDOW_TITLE, home_layout, finalize=True, return_keyboard_events=True, element_justification='c')
+
+def home_event_processing(window):
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED or event == 'Quit':
+            break
+        elif event == ADD_GROUP:
+            return ADD_GROUP
+        elif event == CREATE_REPORT:
+            return CREATE_REPORT
 
 def last_nonzero_index(inp):
     '''
@@ -118,16 +136,6 @@ def add_group_window():
         [sg.Button('Submit', **submit_button_options), sg.Button('Back', **submit_button_options)],        
     ]
     return sg.Window(WINDOW_TITLE, add_group_layout, finalize=True, return_keyboard_events=True, element_justification='c')
-
-def home_event_processing(window):
-    while True:
-        event, values = window.read()
-        if event == sg.WIN_CLOSED:
-            break
-        elif event == ADD_GROUP:
-            return ADD_GROUP
-        elif event == CREATE_REPORT:
-            return CREATE_REPORT
 
 ENTER = 'Return:603979789'
 
@@ -318,6 +326,7 @@ def create_report_event_processing(window):
                     report = gen_report(start, end)
                     print(report)
                     report_save_funcs[_type](report, values[_type])
+                    return HOME
         elif event == 'Save As':
             print(values['Text'])
 
@@ -345,9 +354,10 @@ if __name__ == '__main__':
     elif 'create-report' in sys.argv:
         current_layout = CREATE_REPORT
 
+    load_data()
+    print(DATA)
+
     # sg.theme('LightGreen3')    
-    # sg.theme_button_color('LightGreen3')
-    # sg.change_look_and_feel('LightBrown3')
     while True:
         window = layouts[current_layout]['window']()
         window.bring_to_front()
