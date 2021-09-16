@@ -3,9 +3,14 @@ import calendar
 from datetime import datetime, timedelta
 import sys
 import json
+import os
+from fpdf import FPDF
 
 DB_FILENAME = 'data.json'
 DATA = None
+
+
+folder_path = os.path.dirname(os.path.realpath(__file__))
 
 with open(DB_FILENAME, 'r') as f:
     DATA = json.load(f)
@@ -16,9 +21,14 @@ def save_data():
     '''
     DATA["LAST_SAVED"] = datetime.today().strftime('%Y-%m-%d %I:%M %p')
     with open(DB_FILENAME, 'w') as f:
-        json.dump(DATA, f)
+        json.dump(DATA, f, indent=2)
 
 REPORT_TITLE = "River City Advocacy Group Sessions Report"
+
+PDF_FONT = {
+    'family': 'Arial',
+    'size': 10,
+}
 
 HOME = 'home'
 ADD_GROUP = 'Add Group Session'
@@ -105,7 +115,7 @@ def add_group_window():
         [sg.Text('Participants:', **label_text_options), sg.InputText(key='-PARTICIPANT-',**text_input_options)],
         [sg.Multiline(key='-PARTICIPANTS-', **text_input_options)],
         [sg.Text('', key='-ERROR-', visible=False, **error_text_options)],
-        [sg.Button('Submit', **submit_button_options), sg.Button('Cancel', **submit_button_options)],        
+        [sg.Button('Submit', **submit_button_options), sg.Button('Back', **submit_button_options)],        
     ]
     return sg.Window(WINDOW_TITLE, add_group_layout, finalize=True, return_keyboard_events=True, element_justification='c')
 
@@ -142,7 +152,7 @@ def add_group_event_processing(window):
                 participants.insert(0, new_participant)
                 window['-PARTICIPANTS-'].update(value='\n'.join(participants))
                 window['-PARTICIPANT-'].update(value='')
-        elif event == 'Cancel':
+        elif event == 'Back':
             return HOME
         elif event == 'Submit':
             group_name = values['-GROUP-']
@@ -170,6 +180,7 @@ def add_group_event_processing(window):
                 for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
                     window[key].update(value='')
                 window['-DATE-'].update(value=today)
+                participants.clear()
         else:
             window['-ERROR-'].update(visible=False, value='')
             
@@ -181,7 +192,8 @@ def create_report_window():
         [sg.Text('End Date (YYYY-MM-DD):', **label_text_options)],
         [sg.InputText(key='-END-', default_text=today, **text_input_options)],
         [sg.Text('', key='-ERROR-', visible=False, **error_text_options)],
-        [sg.Button('PDF', **submit_button_options), sg.Button('Text', **submit_button_options), sg.Button('Cancel', **submit_button_options)],
+        [sg.FileSaveAs('PDF',initial_folder=folder_path, target="-FILEPATH-", **submit_button_options), sg.FileSaveAs('Text', initial_folder=folder_path, target="-FILEPATH-", **submit_button_options), sg.Button('Back', **submit_button_options)],
+        [sg.Input(key='-FILEPATH-', enable_events=True, visible=False)]
     ] 
     return sg.Window(WINDOW_TITLE, create_report_layout, finalize=True, return_keyboard_events=True, element_justification='c')
 
@@ -244,11 +256,29 @@ def gen_report(start_str, end_str):
 
     return report
 
-def save_pdf(report):
-    pass
+def save_pdf(report, path):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font(**PDF_FONT)
+    lines = report.split('\n')
+    pdf.cell(200, 10, txt=lines[0], ln=1, align='C')
+    for line in lines[1:]:
+        for i in range(len(line)):
+            if line[i] != '\t':
+                break
+            pdf.cell(10)
+        pdf.cell(200, 5, txt=line, ln=1)
+    if path.endswith('/'):
+        path += 'report.pdf'
+    if not path.endswith('.pdf'):
+        path += '.pdf'
+    pdf.output(path)
 
-def save_txt(report):
-    print(report)
+def save_txt(report, path):
+    if not path.endswith('.txt'):
+        path += '.txt'
+    with open(path, 'w') as f:
+        f.write(report)
 
 report_save_funcs = {
     'PDF': save_pdf,
@@ -263,9 +293,9 @@ def create_report_event_processing(window):
 
         if event == sg.WIN_CLOSED:
             break
-        elif event == 'Cancel':
+        elif event == 'Back':
             return HOME
-        elif event in report_save_funcs.keys():
+        elif event == "-FILEPATH-":
             start = get_date(values['-START-'])
             end = get_date(values['-END-'])
             error = None
@@ -277,10 +307,19 @@ def create_report_event_processing(window):
             if error:
                 window['-ERROR-'].update(visible=True, value=f'Invalid {error} date, Please enter in YYYY-MM-DD format')
             else:
-                # generate the report
-                report = gen_report(start, end)
-                print('saving report')
-                report_save_funcs[event](report)
+                # find the button that was pressed
+                _type = None
+                for key, val in values.items():
+                    if key in report_save_funcs and val:
+                        _type = key
+                        break
+                if _type: # the save was not canceled
+                    # generate the report
+                    report = gen_report(start, end)
+                    print(report)
+                    report_save_funcs[_type](report, values[_type])
+        elif event == 'Save As':
+            print(values['Text'])
 
 
 layouts = {
