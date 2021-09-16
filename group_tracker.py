@@ -47,7 +47,7 @@ WINDOW_TITLE = 'Group Tracker'
 
 
 button_options = {
-    'size': (20, 1.5),
+    'size': (20, 2),
     'font': 'arial 20 bold',
     'pad': (50, 10),
 }
@@ -218,9 +218,9 @@ def date_in(date_str, start, end):
 def gen_report(start_str, end_str):
     start = datetime.strptime(start_str, '%Y-%m-%d')
     end = datetime.strptime(end_str, '%Y-%m-%d')
-    start_out = start.strftime('%B %-d, %Y')
-    end_out = end.strftime('%B %-d, %Y')
-    now_str = datetime.today().strftime('%A, %B %-d, %Y at %-I:%M %p')
+    start_out = start.strftime('%B %d, %Y')
+    end_out = end.strftime('%B %d, %Y')
+    now_str = datetime.today().strftime('%A, %B %d, %Y at %I:%M %p')
     report = REPORT_TITLE + "\n"
     report += f'Generated on {now_str}\n'
     report += f'Time Period: {start_out} to {end_out}\n'
