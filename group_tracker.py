@@ -1,6 +1,6 @@
 import PySimpleGUI as sg
 import calendar
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 import json
 
@@ -9,7 +9,6 @@ DATA = None
 
 with open(DB_FILENAME, 'r') as f:
     DATA = json.load(f)
-    print(DATA)
 
 def save_data():
     '''
@@ -92,7 +91,9 @@ def last_nonzero_index(inp):
 
 # groups = [f'Group {i}' for i in range(7)]
 
-today = datetime.today().strftime('%Y-%m-%d')
+today_obj = datetime.today()
+today = today_obj.strftime('%Y-%m-%d')
+last_week = (today_obj - timedelta(weeks=1)).strftime('%Y-%m-%d')
 
 def add_group_window():
     add_group_layout = [
@@ -174,7 +175,7 @@ def create_report_window():
     create_report_layout = [
         [sg.Text('Generate Report', **header_text_options)],
         [sg.Text('Start Date (YYYY-MM-DD):', **label_text_options)],
-        [sg.InputText(key='-START-', **text_input_options)],
+        [sg.InputText(key='-START-', default_text=last_week, **text_input_options)],
         [sg.Text('End Date (YYYY-MM-DD):', **label_text_options)],
         [sg.InputText(key='-END-', default_text=today, **text_input_options)],
         [sg.Text('', key='-ERROR-', visible=False, **error_text_options)],
