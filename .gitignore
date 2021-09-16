@@ -1,2 +1,6 @@
 .DS_Store
 env
+build
+dist
+__pycache__
+*.spec

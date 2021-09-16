@@ -150,8 +150,6 @@ def add_group_event_processing(window):
     participants = []
     while True:
         event, values = window.read()
-        print(event)
-        print(values)
         if event == sg.WIN_CLOSED:
             break
         elif event in ('\r', ENTER):
@@ -296,9 +294,6 @@ report_save_funcs = {
 def create_report_event_processing(window):
     while True:
         event, values = window.read()
-        print(event)
-        print(values)
-
         if event == sg.WIN_CLOSED:
             break
         elif event == 'Back':
@@ -324,12 +319,8 @@ def create_report_event_processing(window):
                 if _type: # the save was not canceled
                     # generate the report
                     report = gen_report(start, end)
-                    print(report)
                     report_save_funcs[_type](report, values[_type])
                     return HOME
-        elif event == 'Save As':
-            print(values['Text'])
-
 
 layouts = {
     HOME: {
@@ -355,7 +346,6 @@ if __name__ == '__main__':
         current_layout = CREATE_REPORT
 
     load_data()
-    print(DATA)
 
     # sg.theme('LightGreen3')    
     while True:
