@@ -18,6 +18,8 @@ def save_data():
     with open(DB_FILENAME, 'w') as f:
         json.dump(DATA, f)
 
+REPORT_TITLE = "River City Advocacy Group Sessions Report"
+
 HOME = 'home'
 ADD_GROUP = 'Add Group Session'
 CREATE_REPORT = 'Create Report'
@@ -183,16 +185,74 @@ def create_report_window():
     ] 
     return sg.Window(WINDOW_TITLE, create_report_layout, finalize=True, return_keyboard_events=True, element_justification='c')
 
-def gen_and_save_pdf(start, end):
-    print(start, end)
+def date_in(date_str, start, end):
+    '''
+    Returns true if date is in between start and end
+    (date_str assumed to be str in YYYY-MM-DD format)
+    (start and end assumed to be datetime objects)
+    '''
+    date = datetime.strptime(date_str, "%Y-%m-%d")
+    return start <= date <= end 
+
+def gen_report(start_str, end_str):
+    start = datetime.strptime(start_str, '%Y-%m-%d')
+    end = datetime.strptime(end_str, '%Y-%m-%d')
+    start_out = start.strftime('%B %-d, %Y')
+    end_out = end.strftime('%B %-d, %Y')
+    now_str = datetime.today().strftime('%A, %B %-d, %Y at %-I:%M %p')
+    report = REPORT_TITLE + "\n"
+    report += f'Generated on {now_str}\n'
+    report += f'Time Period: {start_out} to {end_out}\n'
+
+    num_people = 0
+
+    groups = {}
+    for person, info in DATA["PEOPLE"].items():
+        person_served = False
+        for group_name, date in info["SESSIONS"]:
+            if date_in(date, start, end):
+                person_served = True
+                groups.setdefault(group_name, {})
+                groups[group_name].setdefault(date, [])
+                groups[group_name][date].append(person)
+        if person_served:
+            num_people += 1
+
+    num_groups = len(groups)
+    num_sessions = sum(len(sessions) for sessions in groups.values())
+    total_attendance = 0
+    for group, sessions in groups.items():
+        total_attendance += sum(len(session) for session in sessions.values())
+
+    avg_attendance = round(total_attendance / num_sessions, 1)
+
+    report += f'Number of unique people: {num_people}\n'
+    report += f'Number of groups: {num_groups}\n'
+    report += f'Number of sessions: {num_sessions}\n'
+    report += f'Average attendance per session: {avg_attendance}\n'
+
+    report += 'Groups:\n'
+    for group, sessions in groups.items():
+        report += f'\t{group}:\n'
+        _people = set()
+        for date, attendees in sessions.items():
+            _people.update(attendees)
+        report += f'\t\tNumber of unique people: {len(_people)}\n'
+        report += f'\t\tNumber of sessions: {len(sessions)}\n'
+        _tot_attendance = sum(len(attendees) for attendees in sessions.values())
+        report += f'\t\tAverage attendance per session: {round(_tot_attendance/len(sessions), 1)}\n'
+
+    return report
+
+def save_pdf(report):
     pass
 
-def gen_and_save_txt(start, end):
-    pass
+def save_txt(report):
+    print(report)
 
-report_funcs = {
-    'PDF': gen_and_save_pdf,
-    'TEXT': gen_and_save_txt,
+report_save_funcs = {
+    'PDF': save_pdf,
+    'Text': save_txt,
 }
 
 def create_report_event_processing(window):
@@ -205,7 +265,7 @@ def create_report_event_processing(window):
             break
         elif event == 'Cancel':
             return HOME
-        elif event in report_funcs.keys():
+        elif event in report_save_funcs.keys():
             start = get_date(values['-START-'])
             end = get_date(values['-END-'])
             error = None
@@ -218,7 +278,9 @@ def create_report_event_processing(window):
                 window['-ERROR-'].update(visible=True, value=f'Invalid {error} date, Please enter in YYYY-MM-DD format')
             else:
                 # generate the report
-                report_funcs[event](start, end)
+                report = gen_report(start, end)
+                print('saving report')
+                report_save_funcs[event](report)
 
 
 layouts = {
