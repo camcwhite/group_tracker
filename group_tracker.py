@@ -6,11 +6,14 @@ import json
 import os
 from fpdf import FPDF
 
-DB_FILENAME = 'data.json'
+if getattr(sys, 'frozen', False):
+    folder_path = os.path.dirname(sys.executable)
+else:
+    folder_path = str(os.path.dirname(__file__))
+
+DB_FILENAME = os.path.join(folder_path, 'data.json')
 DATA = None
 
-
-folder_path = os.path.dirname(os.path.realpath(__file__))
 
 def load_data():
     global DATA

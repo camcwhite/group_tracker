@@ -1,0 +1,6 @@
+altgraph==0.17.2
+fpdf==1.7.2
+macholib==1.15.2
+pyinstaller==4.5.1
+pyinstaller-hooks-contrib==2021.3
+PySimpleGUI==4.47.0
