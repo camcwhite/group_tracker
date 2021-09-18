@@ -3,6 +3,7 @@ import calendar
 from datetime import datetime, timedelta
 import sys
 import json
+from PySimpleGUI.PySimpleGUI import Button
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 import os
@@ -23,10 +24,11 @@ DB_SCHEMA = {
         "SESSIONS": {
             "type": "array",
             "items": {
-                "type": "objects",
+                "type": "object",
                 "properties": {
                     "GROUP_NAME": {"type": "string"},
                     "DATE": {"type": "string"},
+                    "DURATION": {"type": "number"},
                     "ATTENDEES": {
                         "type": "array",
                         "items": {"type": "string"}
@@ -43,7 +45,7 @@ def load_data():
         with open(DB_FILENAME, 'r') as f:
             new_data = json.load(f)
             try:
-                validate(new_data)
+                validate(new_data, DB_SCHEMA)
                 DATA = new_data
             except ValidationError as err:
                 print(f'Error validating:\n{err}')
@@ -63,7 +65,7 @@ def save_data():
     with open(DB_FILENAME, 'w') as f:
         json.dump(DATA, f, indent=2)
 
-REPORT_TITLE = "River City Advocacy Group Sessions Report"
+REPORT_TITLE = "River City Advocacy Peer Support Participants Report"
 
 PDF_FONT = {
     'family': 'Arial',
@@ -71,7 +73,7 @@ PDF_FONT = {
 }
 
 HOME = 'home'
-ADD_GROUP = 'Add Group Session'
+ADD_SESSION = 'Add Group Session'
 CREATE_REPORT = 'Create Report'
 WINDOW_TITLE = 'Group Tracker'
 
@@ -105,6 +107,23 @@ text_input_options = {
     'font': 'arial 25',
 }
 
+date_input_options = {
+    'size': (10, 10),
+    'font': 'arial 25',
+    'justification': 'right',
+}
+
+number_input_options = {
+    'size': (3, 10),
+    'font': 'arial 25',
+    'justification': 'right',
+}
+
+ticker_button_options = {
+    'font': 'arial 15',
+    'pad': 10,
+}
+
 text_box_options = {
     'size': (30, 10),
     'font': 'arial 20',
@@ -117,8 +136,8 @@ error_text_options = {
 
 def home_window():
     home_layout = [
-        [sg.Text('Welcome to Group Tracker!', **header_text_options)],
-        [sg.Button(ADD_GROUP, **button_options)],
+        [sg.Text('Peer Support Participant Tracker', **header_text_options)],
+        [sg.Button(ADD_SESSION, **button_options)],
         [sg.Button(CREATE_REPORT, **button_options)],
         [sg.Button('Quit', **button_options)],
     ]
@@ -129,8 +148,8 @@ def home_event_processing(window):
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Quit':
             break
-        elif event == ADD_GROUP:
-            return ADD_GROUP
+        elif event == ADD_SESSION:
+            return ADD_SESSION
         elif event == CREATE_REPORT:
             return CREATE_REPORT
 
@@ -143,32 +162,27 @@ def last_nonzero_index(inp):
             return i + 1
         
     raise ValueError('All elements are 0')
-        
-
-# month_name = calendar.month_name[datetime.today().month]
-# days = list(calendar.Calendar().itermonthdays(datetime.today().year, datetime.today().month))
-# days = days[days.index(1):last_nonzero_index(days)]
-
-# year = datetime.today().year
-# years = [_ for _ in range(year-1, year+5)]
-
-# groups = [f'Group {i}' for i in range(7)]
 
 today_obj = datetime.today()
 today = today_obj.strftime('%Y-%m-%d')
 last_week = (today_obj - timedelta(weeks=1)).strftime('%Y-%m-%d')
 
-def add_group_window():
-    add_group_layout = [
+def add_session_window():
+    add_session_layout = [
         [sg.Text('Add a Group Session', **header_text_options)],
         [sg.Text('Group Name:', **label_text_options), sg.InputText(key='-GROUP-', **text_input_options)],
-        [sg.Text('Date:', **label_text_options), sg.InputText(default_text=today, key='-DATE-', **text_input_options)],
+        [sg.Text('Date:', **label_text_options), 
+            sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
+        [sg.Text('Duration (hours):', **label_text_options), 
+            sg.Button('-', key='-DURATION_MINUS-', **ticker_button_options), 
+            sg.InputText(default_text='1', key='-DURATION-', **number_input_options),
+            sg.Button('+', key='-DURATION_PLUS-', **ticker_button_options)],
         [sg.Text('Participants:', **label_text_options), sg.InputText(key='-PARTICIPANT-',**text_input_options)],
         [sg.Multiline(key='-PARTICIPANTS-', **text_input_options)],
         [sg.Text('', key='-ERROR-', visible=False, **error_text_options)],
         [sg.Button('Submit', **submit_button_options), sg.Button('Back', **submit_button_options)],        
     ]
-    return sg.Window(WINDOW_TITLE, add_group_layout, finalize=True, return_keyboard_events=True, element_justification='c')
+    return sg.Window(WINDOW_TITLE, add_session_layout, finalize=True, return_keyboard_events=True, element_justification='c')
 
 ENTER = 'Return:603979789'
 
@@ -179,8 +193,17 @@ def get_date(date_str):
     except ValueError: # invalid date
         return None
 
-def add_group_event_processing(window):
+def valid_num(num_str):
+    try:
+        float(num_str)
+        return True
+    except ValueError:
+        return False
+
+def add_session_event_processing(window):
     participants = []
+    float_or_zero = lambda s: float(s) if valid_num(s) else 0
+    make_int = lambda n: int(n) if int(n) == n else n
     while True:
         event, values = window.read()
         if event == sg.WIN_CLOSED:
@@ -193,15 +216,24 @@ def add_group_event_processing(window):
                 window['-PARTICIPANT-'].update(value='')
         elif event == 'Back':
             return HOME
+        elif event == '-DURATION_MINUS-':
+            duration = make_int(float_or_zero(values['-DURATION-']))
+            window['-DURATION-'].update(value=max(0, duration-1))
+        elif event == '-DURATION_PLUS-':
+            duration = make_int(float_or_zero(values['-DURATION-']))
+            window['-DURATION-'].update(value=duration+1)
         elif event == 'Submit':
             group_name = values['-GROUP-']
             date = get_date(values['-DATE-'])
+            duration = values['-DURATION-']
             participants = [val for val in values['-PARTICIPANTS-'].split('\n') if val]
             error = None
             if not group_name:
                 error = 'Group Name is empty'
             elif not date:
                 error = 'Invalid Date, Please enter in YYYY-MM-DD format'
+            elif not duration or not valid_num(duration):
+                error = 'Please enter a number (in hours) for Duration'
             elif not participants:
                 error = 'No participants entered'
             
@@ -209,11 +241,13 @@ def add_group_event_processing(window):
                 window['-ERROR-'].update(visible=True, value=error)
             else:
                 # Submit the data
-                people_db = DATA['PEOPLE']
-                for name in participants:
-                    name = name.lower() # might change this later
-                    people_db.setdefault(name, {"SESSIONS": []})
-                    people_db[name]["SESSIONS"].append([group_name, date])
+                sessions_list = DATA["SESSIONS"]
+                sessions_list.append({
+                    "GROUP_NAME": group_name,
+                    "DATE": date,
+                    "DURATION": float(duration),
+                    "ATTENDEES": [name.lower() for name in participants]
+                })
                 save_data()
                 # clear form
                 for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
@@ -360,9 +394,9 @@ layouts = {
         'window': home_window,
         'event_processing': home_event_processing,
     },
-    ADD_GROUP: {
-        'window': add_group_window,
-        'event_processing': add_group_event_processing,
+    ADD_SESSION: {
+        'window': add_session_window,
+        'event_processing': add_session_event_processing,
     },
     CREATE_REPORT: {
         'window': create_report_window,
@@ -373,8 +407,8 @@ layouts = {
 if __name__ == '__main__':
     current_layout = HOME
     args = sys.argv
-    if 'add-group' in sys.argv:
-        current_layout = ADD_GROUP
+    if 'add-session' in sys.argv:
+        current_layout = ADD_SESSION
     elif 'create-report' in sys.argv:
         current_layout = CREATE_REPORT
 
