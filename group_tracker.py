@@ -297,12 +297,14 @@ def gen_report(start_str, end_str):
         SESSIONS: Dates --> Attendees List
         PEOPLE: Set of People served
         TOTAL_ATTENDANCE: Number of total attendees
+        TOTAL_HOURS: Number of total hours
     }
     '''
     groups = {}
     people = set()
     total_attendance = 0
     num_sessions = 0
+    tot_hours = 0
     for session in DATA["SESSIONS"]:
         date = session['DATE']
         if date_in(date, start, end):
@@ -317,6 +319,10 @@ def gen_report(start_str, end_str):
             group.setdefault('TOTAL_ATTENDANCE', 0)
             group['TOTAL_ATTENDANCE'] += len(participants)
 
+            group.setdefault('TOTAL_HOURS', 0)
+            group['TOTAL_HOURS'] += session['DURATION_HOURS']
+            tot_hours += session['DURATION_HOURS']
+
             total_attendance += len(participants)
             people.update(participants)
             group.setdefault('SESSIONS', {})
@@ -329,18 +335,23 @@ def gen_report(start_str, end_str):
     num_groups = len(groups)
 
     avg_attendance = round(total_attendance / num_sessions, 1) if num_sessions else 'N/A'
+    avg_duration = round(tot_hours / num_sessions, 1) if num_sessions else 'N/A'
 
     report += f'Number of unique people: {num_people}\n'
     report += f'Number of groups: {num_groups}\n'
     report += f'Number of sessions: {num_sessions}\n'
+    report += f'Number of total hours: {tot_hours}\n'
     report += f'Average attendance per session: {avg_attendance}\n'
+    report += f'Average session duration: {avg_duration} hours\n'
 
     report += 'Groups:\n'
     for group_name, group_info in groups.items():
         report += f'\t{group_name}:\n'
         report += f'\t\tNumber of unique people: {len(group_info["PEOPLE"])}\n'
         report += f'\t\tNumber of sessions: {len(group_info["SESSIONS"])}\n'
+        report += f'\t\tNumber of hours: {group_info["TOTAL_HOURS"]}\n'
         report += f'\t\tAverage attendance per session: {round(group["TOTAL_ATTENDANCE"]/len(sessions), 1)}\n'
+        report += f'\t\tAverage session duration: {round(group["TOTAL_HOURS"]/len(sessions), 1)} hours\n'
 
     return report
 
