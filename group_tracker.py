@@ -195,10 +195,22 @@ today_obj = datetime.today()
 today = today_obj.strftime('%Y-%m-%d')
 last_week = (today_obj - timedelta(weeks=1)).strftime('%Y-%m-%d')
 
+dropdown_options = {
+    'values':[],
+    'size': (20, 5), 
+    'enable_events': True,
+    'select_mode':sg.LISTBOX_SELECT_MODE_SINGLE, 
+    'no_scrollbar':True,
+}
+
 def add_session_window():
     add_session_layout = [
         [sg.Text('Add a Group Session', **header_text_options)],
-        [sg.Text('Group Name:', **label_text_options), sg.InputText(key='-GROUP-', **text_input_options)],
+        [sg.Text('Group Name:', **label_text_options), sg.InputText(key='-GROUP-', enable_events=True, **text_input_options)],
+        [sg.pin(sg.Col([[
+            sg.Listbox(key='-GROUP_DROPDOWN-', **dropdown_options)]],
+                       key='-GROUP_DROPDOWN_CONTAINER-', 
+                       pad=(0, 0), visible=False))],
         [sg.Text('Date:', **label_text_options), 
             sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
         [sg.Text('Duration (hours):', **label_text_options), 
@@ -256,6 +268,9 @@ def validate_session_info(values):
 
 def add_session_event_processing(window):
     participants = []
+    group_prediction_list = []
+    participant_prediction_list = []
+    dropdown_index = 0
     while True:
         event, values = window.read()
         print(event, values)
@@ -299,8 +314,29 @@ def add_session_event_processing(window):
                 window['-DATE-'].update(value=today)
                 window['-DURATION-'].update(value='1')
                 participants.clear()
+        elif event.startswith('Up') and (group_prediction_list or participant_prediction_list):
+            prediction_list = group_prediction_list if group_prediction_list else participant_prediction_list
+            list_element = window['-GROUP_DROPDOWN-'] if group_prediction_list else window['-PARTICIPANT_DROPDOWN-']
+            dropdown_index = (dropdown_index + (len(prediction_list) - 1)) % len(prediction_list)
+            list_element.update(set_to_index=dropdown_index)
+        elif event.startswith('Down') and (group_prediction_list or participant_prediction_list):
+            prediction_list = group_prediction_list if group_prediction_list else participant_prediction_list
+            list_element = window['-GROUP_DROPDOWN-'] if group_prediction_list else window['-PARTICIPANT_DROPDOWN-']
+            dropdown_index = (dropdown_index + 1) % len(prediction_list)
+            list_element.update(set_to_index=dropdown_index)
+        elif event == '-GROUP-':
+            group_val = values['-GROUP-']
+            group_prediction_list = [val for val in DATA["GROUPS"] if val.startswith(group_val)]
+            print(group_prediction_list)
+            if group_prediction_list:
+                window['-GROUP_DROPDOWN-'].update(values=group_prediction_list, set_to_index=0)
+                window['-GROUP_DROPDOWN_CONTAINER-'].update(visible=True)
+            else:
+                window['-GROUP_DROPDOWN_CONTAINER-'].update(visible=False)
         else:
             window['-ERROR-'].update(visible=False, value='')
+
+
 
 def edit_session_window():
     edit_session_layout = [
