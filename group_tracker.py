@@ -292,25 +292,43 @@ def gen_report(start_str, end_str):
 
     num_people = 0
 
+    '''
+    groups: Group Names --> {
+        SESSIONS: Dates --> Attendees List
+        PEOPLE: Set of People served
+        TOTAL_ATTENDANCE: Number of total attendees
+    }
+    '''
     groups = {}
-    for person, info in DATA["PEOPLE"].items():
-        person_served = False
-        for group_name, date in info["SESSIONS"]:
-            if date_in(date, start, end):
-                person_served = True
-                groups.setdefault(group_name, {})
-                groups[group_name].setdefault(date, [])
-                groups[group_name][date].append(person)
-        if person_served:
-            num_people += 1
+    people = set()
+    total_attendance = 0
+    num_sessions = 0
+    for session in DATA["SESSIONS"]:
+        date = session['DATE']
+        if date_in(date, start, end):
+            num_sessions += 1
+            group_name = session['GROUP_NAME']
+            groups.setdefault(group_name, {})
+            group = groups[group_name]
+
+            participants = session['ATTENDEES']
+            group.setdefault('PEOPLE', set())
+            group['PEOPLE'].update(participants)
+            group.setdefault('TOTAL_ATTENDANCE', 0)
+            group['TOTAL_ATTENDANCE'] += len(participants)
+
+            total_attendance += len(participants)
+            people.update(participants)
+            group.setdefault('SESSIONS', {})
+            sessions = group['SESSIONS']
+            sessions.setdefault(date, [])
+            sessions[date].extend(participants)
+
+    num_people = len(people)
 
     num_groups = len(groups)
-    num_sessions = sum(len(sessions) for sessions in groups.values())
-    total_attendance = 0
-    for group, sessions in groups.items():
-        total_attendance += sum(len(session) for session in sessions.values())
 
-    avg_attendance = round(total_attendance / num_sessions, 1)
+    avg_attendance = round(total_attendance / num_sessions, 1) if num_sessions else 'N/A'
 
     report += f'Number of unique people: {num_people}\n'
     report += f'Number of groups: {num_groups}\n'
@@ -318,15 +336,11 @@ def gen_report(start_str, end_str):
     report += f'Average attendance per session: {avg_attendance}\n'
 
     report += 'Groups:\n'
-    for group, sessions in groups.items():
-        report += f'\t{group}:\n'
-        _people = set()
-        for date, attendees in sessions.items():
-            _people.update(attendees)
-        report += f'\t\tNumber of unique people: {len(_people)}\n'
-        report += f'\t\tNumber of sessions: {len(sessions)}\n'
-        _tot_attendance = sum(len(attendees) for attendees in sessions.values())
-        report += f'\t\tAverage attendance per session: {round(_tot_attendance/len(sessions), 1)}\n'
+    for group_name, group_info in groups.items():
+        report += f'\t{group_name}:\n'
+        report += f'\t\tNumber of unique people: {len(group_info["PEOPLE"])}\n'
+        report += f'\t\tNumber of sessions: {len(group_info["SESSIONS"])}\n'
+        report += f'\t\tAverage attendance per session: {round(group["TOTAL_ATTENDANCE"]/len(sessions), 1)}\n'
 
     return report
 
