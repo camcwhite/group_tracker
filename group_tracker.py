@@ -210,6 +210,7 @@ def add_session_window():
         [sg.Text('Group Name:', **label_text_options), 
             sg.Combo(key='-GROUP-', 
                     values=DATA["GROUPS"], 
+                    enable_events=True,
                     **combo_box_options)],
         [sg.Text('Date:', **label_text_options), 
             sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
@@ -270,6 +271,7 @@ def validate_session_info(values):
 
 def add_session_event_processing(window):
     participants = []
+    prev_group_val = ''
     while True:
         event, values = window.read()
         print(event, values)
@@ -298,7 +300,7 @@ def add_session_event_processing(window):
             else:
                 # Submit the data
                 sessions_list = DATA["SESSIONS"]
-                session_attendees = [name.lower() for name in participants]
+                session_attendees = participants[:]
                 sessions_list.append({
                     "GROUP_NAME": group_name,
                     "DATE": date,
@@ -318,6 +320,19 @@ def add_session_event_processing(window):
                 participants.clear()
         else:
             window['-ERROR-'].update(visible=False, value='')
+
+            if values['-GROUP-'] != prev_group_val:
+                prev_group_val = values['-GROUP-']
+                prediction_list = [val for val in DATA["GROUPS"] if val.startswith(values['-GROUP-'])] 
+                print('change')
+                if prev_group_val and prediction_list:
+                    print('down')
+                    window['-GROUP-'].update(value=prev_group_val, values=prediction_list)
+                    window['-GROUP-'].TKCombo.event_generate('<Down>')
+                    window['-GROUP-'].TKCombo.focus_set()
+                else:
+                    print('close')
+                    window['-GROUP-'].TKCombo.event_generate('<Escape>')
 
 def edit_session_window():
     edit_session_layout = [
@@ -395,7 +410,7 @@ def edit_session_event_processing(window):
                 window['-ERROR-'].update(visible=True, value=error)
             else:
                 # Save the data
-                session_attendees = [name.lower() for name in participants]
+                session_attendees = participants[:]
                 sessions[current_session_index] = {
                     "GROUP_NAME": group_name,
                     "DATE": date,
