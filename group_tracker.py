@@ -289,7 +289,6 @@ def add_session_event_processing(window):
     participant_dropdown_open = False
     while True:
         event, values = window.read()
-        print(event, values)
         if event == sg.WIN_CLOSED:
             break
         elif event in ('\r', ENTER):
@@ -440,7 +439,6 @@ def edit_session_event_processing(window):
             if new_participant:
                 participants = get_participant_list(values['-PARTICIPANTS-'])
                 participants.insert(0, new_participant)
-                print(participants)
                 window['-PARTICIPANTS-'].update(value='\n'.join(participants))
                 window['-PARTICIPANT-'].update(value='')
                 window['-PARTICIPANT-'].TKCombo.event_generate('<Escape>')
@@ -475,6 +473,8 @@ def edit_session_event_processing(window):
         elif event == 'Delete':
             del sessions[current_session_index]
             save_data()
+            if not sessions:
+                return ERROR
             current_session_index = max(0, current_session_index-1)
             update_window(sessions[current_session_index])
         elif event == 'Save':
