@@ -273,8 +273,6 @@ def add_session_event_processing(window):
     participants = []
     prediction_list = []
     prev_group_val = ''
-    dropdown_index = 0
-    group_dropdown_open = False
     prev_participant_val = ''
     participant_dropdown_open = False
     while True:
@@ -284,11 +282,17 @@ def add_session_event_processing(window):
             break
         elif event in ('\r', ENTER):
             new_participant = values['-PARTICIPANT-']
+            if participant_dropdown_open and len(prediction_list) == 1:
+                new_participant = prediction_list[0]
+
             if new_participant:
                 participants = get_participant_list(values['-PARTICIPANTS-'])
                 participants.insert(0, new_participant)
                 window['-PARTICIPANTS-'].update(value='\n'.join(participants))
                 window['-PARTICIPANT-'].update(value='')
+                window['-PARTICIPANT-'].TKCombo.event_generate('<Escape>')
+                participant_dropdown_open = False
+                prediction_list = []
         elif event == 'Back':
             return HOME
         elif event == '-DURATION_MINUS-':
@@ -343,23 +347,28 @@ def add_session_event_processing(window):
                     window['-PARTICIPANT-'].update(value=prev_participant_val, values=prediction_list)
                     window['-PARTICIPANT-'].TKCombo.event_generate('<Down>')
                     window['-PARTICIPANT-'].TKCombo.focus_set()
+                    participant_dropdown_open = True
                 else:
                     window['-PARTICIPANT-'].TKCombo.event_generate('<Escape>')
                     window['-PARTICIPANT-'].update(value=prev_participant_val, values=DATA["PARTICIPANTS"])
+                    participant_dropdown_open = False
+                    prediction_list = []
 
 def edit_session_window():
     edit_session_layout = [
         [sg.Button('Prev', key='-PREV-', **submit_button_options), sg.Text('Edit a Group Session', **header_text_options), 
             sg.Button('Next', key='-NEXT-', **submit_button_options)],
         [sg.Text('', key='-SESSION_COUNT-', **label_text_options)],
-        [sg.Text('Group Name:', **label_text_options), sg.InputText(key='-GROUP-', **text_input_options)],
+        [sg.Text('Group Name:', **label_text_options), sg.Combo(key='-GROUP-', values=DATA["GROUPS"], **combo_box_options)],
         [sg.Text('Date:', **label_text_options), 
             sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
         [sg.Text('Duration (hours):', **label_text_options), 
             sg.Button('-', key='-DURATION_MINUS-', **ticker_button_options), 
             sg.InputText(default_text='1', key='-DURATION-', **number_input_options),
             sg.Button('+', key='-DURATION_PLUS-', **ticker_button_options)],
-        [sg.Text('Participants:', **label_text_options), sg.InputText(key='-PARTICIPANT-',**text_input_options)],
+        [sg.Text('Participants:', **label_text_options), 
+        sg.Combo(key='-PARTICIPANT-', 
+        values=DATA["PARTICIPANTS"], **combo_box_options)],
         [sg.Multiline(key='-PARTICIPANTS-', **text_input_options)],
         [sg.Text('', key='-ERROR-', visible=False, **error_text_options)],
         [sg.Button('Save', **submit_button_options), sg.Button('Delete', **submit_button_options), sg.Button('Back', **submit_button_options)],        
@@ -384,6 +393,10 @@ def edit_session_event_processing(window):
     update_window(sessions[current_session_index])
 
     participants = []
+    prev_group_val = ''
+    prev_participant_val = ''
+    participant_dropdown_open = False
+    prediction_list = []
     while True:
         window['-PREV-'].update(disabled=current_session_index == 0) 
         window['-NEXT-'].update(disabled=current_session_index == len(sessions)-1) 
@@ -393,10 +406,16 @@ def edit_session_event_processing(window):
             break
         elif event in ('\r', ENTER):
             new_participant = values['-PARTICIPANT-']
+            if participant_dropdown_open and len(prediction_list) == 1:
+                new_participant = prediction_list[0]
+
             if new_participant:
                 participants.insert(0, new_participant)
                 window['-PARTICIPANTS-'].update(value='\n'.join(participants))
                 window['-PARTICIPANT-'].update(value='')
+                window['-PARTICIPANT-'].TKCombo.event_generate('<Escape>')
+                participant_dropdown_open = False
+                prediction_list = []
         elif event == '-PREV-':
             current_session_index = max(0, current_session_index-1)
             update_window(sessions[current_session_index])
@@ -441,6 +460,30 @@ def edit_session_event_processing(window):
                 participants.clear()
         else:
             window['-ERROR-'].update(visible=False, value='')
+
+            if values['-GROUP-'] != prev_group_val:
+                prev_group_val = values['-GROUP-']
+                prediction_list = [val for val in DATA["GROUPS"] if val.lower().startswith(values['-GROUP-'].lower())] 
+                if prev_group_val and prediction_list and prediction_list[0].lower() != prev_group_val.lower():
+                    window['-GROUP-'].update(value=prev_group_val, values=prediction_list)
+                    window['-GROUP-'].TKCombo.event_generate('<Down>')
+                    window['-GROUP-'].TKCombo.focus_set()
+                else:
+                    window['-GROUP-'].TKCombo.event_generate('<Escape>')
+                    window['-GROUP-'].update(value=prev_group_val, values=DATA["GROUPS"])
+            elif values['-PARTICIPANT-'] != prev_participant_val:
+                prev_participant_val = values['-PARTICIPANT-']
+                prediction_list = [val for val in DATA["PARTICIPANTS"] if val.lower().startswith(values['-PARTICIPANT-'].lower())] 
+                if prev_participant_val and prediction_list and prediction_list[0].lower() != prev_participant_val.lower():
+                    window['-PARTICIPANT-'].update(value=prev_participant_val, values=prediction_list)
+                    window['-PARTICIPANT-'].TKCombo.event_generate('<Down>')
+                    window['-PARTICIPANT-'].TKCombo.focus_set()
+                    participant_dropdown_open = True
+                else:
+                    window['-PARTICIPANT-'].TKCombo.event_generate('<Escape>')
+                    window['-PARTICIPANT-'].update(value=prev_participant_val, values=DATA["PARTICIPANTS"])
+                    participant_dropdown_open = False
+                    prediction_list = []
 
 def create_report_window():
     create_report_layout = [
