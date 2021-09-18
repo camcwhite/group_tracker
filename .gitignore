@@ -4,6 +4,5 @@ build
 dist
 __pycache__
 *.spec
-data.json
-data_corrupted.json
+RCA_Peer_Support_Data
 report.*

@@ -16,7 +16,8 @@ if getattr(sys, 'frozen', False):
 else:
     folder_path = str(os.path.dirname(__file__))
 
-DB_FILENAME = os.path.join(folder_path, 'data.json')
+DB_FOLDER = os.path.join(folder_path, 'RCA_Peer_Support_Data')
+DB_FILENAME = os.path.join(DB_FOLDER, 'data.json')
 DATA = None
 
 DB_SCHEMA = {
@@ -45,8 +46,6 @@ DB_SCHEMA = {
 }
 
 def load_data(second_try=False):
-    if second_try:
-        raise ValueError('There is an internal error with the data file.')
     global DATA
     try:
         with open(DB_FILENAME, 'r') as f:
@@ -54,9 +53,13 @@ def load_data(second_try=False):
             validate(new_data, DB_SCHEMA)
             DATA = new_data
     except (ValidationError, FileNotFoundError) as err:
+        if second_try:
+            raise ValueError('There is an internal error with the data file.')
         print('Error loading data:', err)
         new_file_path = os.path.join(os.path.dirname(DB_FILENAME), 'data_corrupted.json')
-        if type(err) is not FileNotFoundError:
+        if not os.path.exists(DB_FOLDER):
+            os.mkdir(DB_FOLDER)
+        elif type(err) is not FileNotFoundError:
             copyfile(DB_FILENAME, new_file_path)
         print('Generating new data.json')
         DATA = {
