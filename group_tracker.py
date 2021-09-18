@@ -3,6 +3,8 @@ import calendar
 from datetime import datetime, timedelta
 import sys
 import json
+from jsonschema import validate
+from jsonschema.exceptions import ValidationError
 import os
 from fpdf import FPDF
 
@@ -14,14 +16,42 @@ else:
 DB_FILENAME = os.path.join(folder_path, 'data.json')
 DATA = None
 
+DB_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "LAST_SAVED": {"type": "string"},
+        "SESSIONS": {
+            "type": "array",
+            "items": {
+                "type": "objects",
+                "properties": {
+                    "GROUP_NAME": {"type": "string"},
+                    "DATE": {"type": "string"},
+                    "ATTENDEES": {
+                        "type": "array",
+                        "items": {"type": "string"}
+                    }
+                }
+            }
+        }
+    }
+}
 
 def load_data():
     global DATA
     try:
         with open(DB_FILENAME, 'r') as f:
-            DATA = json.load(f)
+            new_data = json.load(f)
+            try:
+                validate(new_data)
+                DATA = new_data
+            except ValidationError as err:
+                print(f'Error validating:\n{err}')
     except FileNotFoundError:
-        DATA = {"PEOPLE": {}}
+        DATA = {
+            "LAST_SAVED": "null",
+            "SESSIONS": [],
+        }
         save_data()
         load_data()
 

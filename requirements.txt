@@ -1,6 +1,10 @@
 altgraph==0.17.2
+attrs==21.2.0
 fpdf==1.7.2
+jsonschema==3.2.0
 macholib==1.15.2
 pyinstaller==4.5.1
 pyinstaller-hooks-contrib==2021.3
+pyrsistent==0.18.0
 PySimpleGUI==4.47.0
+six==1.16.0
