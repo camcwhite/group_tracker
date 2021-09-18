@@ -4,7 +4,7 @@
     {
       "GROUP_NAME": "Group 1",
       "DATE": "2021-09-17",
-      "DURATION": 2.0,
+      "DURATION_HOURS": 2.0,
       "ATTENDEES": [
         "caleel",
         "mom",

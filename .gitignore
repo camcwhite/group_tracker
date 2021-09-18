@@ -5,4 +5,5 @@ dist
 __pycache__
 *.spec
 data.json
+data_corrupted.json
 report.*

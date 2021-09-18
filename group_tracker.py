@@ -7,7 +7,9 @@ from PySimpleGUI.PySimpleGUI import Button
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 import os
+from shutil import copyfile
 from fpdf import FPDF
+# from uuid import uuid4 as new_id
 
 if getattr(sys, 'frozen', False):
     folder_path = os.path.dirname(sys.executable)
@@ -27,35 +29,42 @@ DB_SCHEMA = {
                 "type": "object",
                 "properties": {
                     "GROUP_NAME": {"type": "string"},
+                    # "ID": {"type": "string"},
                     "DATE": {"type": "string"},
                     "DURATION_HOURS": {"type": "number"},
                     "ATTENDEES": {
                         "type": "array",
                         "items": {"type": "string"}
                     }
-                }
+                },
+                "additionalProperties": False,
+                "minProperties": 4,
             }
         }
     }
 }
 
-def load_data():
+def load_data(second_try=False):
+    if second_try:
+        raise ValueError('There is an internal error with the data file.')
     global DATA
     try:
         with open(DB_FILENAME, 'r') as f:
             new_data = json.load(f)
-            try:
-                validate(new_data, DB_SCHEMA)
-                DATA = new_data
-            except ValidationError as err:
-                print(f'Error validating:\n{err}')
-    except FileNotFoundError:
+            validate(new_data, DB_SCHEMA)
+            DATA = new_data
+    except (ValidationError, FileNotFoundError) as err:
+        print('Error loading data:', err)
+        new_file_path = os.path.join(os.path.dirname(DB_FILENAME), 'data_corrupted.json')
+        if type(err) is not FileNotFoundError:
+            copyfile(DB_FILENAME, new_file_path)
+        print('Generating new data.json')
         DATA = {
             "LAST_SAVED": "null",
             "SESSIONS": [],
         }
         save_data()
-        load_data()
+        load_data(second_try=True)
 
 def save_data():
     '''
