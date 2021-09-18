@@ -28,7 +28,7 @@ DB_SCHEMA = {
                 "properties": {
                     "GROUP_NAME": {"type": "string"},
                     "DATE": {"type": "string"},
-                    "DURATION": {"type": "number"},
+                    "DURATION_HOURS": {"type": "number"},
                     "ATTENDEES": {
                         "type": "array",
                         "items": {"type": "string"}
@@ -245,7 +245,7 @@ def add_session_event_processing(window):
                 sessions_list.append({
                     "GROUP_NAME": group_name,
                     "DATE": date,
-                    "DURATION": float(duration),
+                    "DURATION_HOURS": float(duration),
                     "ATTENDEES": [name.lower() for name in participants]
                 })
                 save_data()
@@ -253,6 +253,7 @@ def add_session_event_processing(window):
                 for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
                     window[key].update(value='')
                 window['-DATE-'].update(value=today)
+                window['-DURATION-'].update(value='1')
                 participants.clear()
         else:
             window['-ERROR-'].update(visible=False, value='')

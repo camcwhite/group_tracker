@@ -1,4 +1,25 @@
 {
-  "LAST_SAVED": "2021-09-17 09:01 PM",
-  "SESSIONS": []
+  "LAST_SAVED": "2021-09-17 09:39 PM",
+  "SESSIONS": [
+    {
+      "GROUP_NAME": "Group 1",
+      "DATE": "2021-09-17",
+      "DURATION": 2.0,
+      "ATTENDEES": [
+        "caleel",
+        "mom",
+        "cam"
+      ]
+    },
+    {
+      "GROUP_NAME": "group 2",
+      "DATE": "2021-09-17",
+      "DURATION_HOURS": 1.0,
+      "ATTENDEES": [
+        "john",
+        "caleel",
+        "cam"
+      ]
+    }
+  ]
 }
