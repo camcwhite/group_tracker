@@ -8,10 +8,13 @@ import json
 from PySimpleGUI.PySimpleGUI import Button
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
+import webbrowser
 import os
 from shutil import copyfile
 from fpdf import FPDF
 # from uuid import uuid4 as new_id
+
+README_URL = 'https://github.com/whiteceric/group_tracker#readme'
 
 if getattr(sys, 'frozen', False):
     folder_path = os.path.dirname(sys.executable)
@@ -689,6 +692,7 @@ def about_window():
         [sg.Text('About', **header_text_options)],
         [sg.Text('This app was made, with love, for River City Advocacy', **label_text_options)],
         [sg.Text('by Renee and Cameron White', **label_text_options)],
+        [sg.Button('See Usage Instructions', key='-VISIT_README-', **label_text_options)],
         [sg.Button('Back', **submit_button_options)],
     ] 
     return sg.Window(WINDOW_TITLE, about_layout, finalize=True, return_keyboard_events=True, element_justification='c')
@@ -698,6 +702,8 @@ def about_event_processing(window):
         event, values = window.read()
         if event == sg.WIN_CLOSED:
             break
+        elif event == '-VISIT_README-':
+            webbrowser.open_new_tab(README_URL)
         elif event == 'Back':
             return HOME
 
