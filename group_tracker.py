@@ -66,11 +66,20 @@ def load_data(second_try=False):
         save_data()
         load_data(second_try=True)
 
+def sessions_key(session):
+    '''
+    Key func for sorting sessions 
+
+    Currently sorts sessions by date most recent first
+    '''
+    return get_date(session['DATE'])
+
 def save_data():
     '''
     Save DATA to disk at DB_FILENAME
     '''
     DATA["LAST_SAVED"] = datetime.today().strftime('%Y-%m-%d %I:%M %p')
+    DATA["SESSIONS"].sort(key=sessions_key, reverse=True)
     with open(DB_FILENAME, 'w') as f:
         json.dump(DATA, f, indent=2)
 
@@ -212,17 +221,32 @@ def valid_num(num_str):
     except ValueError:
         return False
 
-def sessions_key(session):
-    '''
-    Key func for sorting sessions 
-
-    Currently sorts sessions by date most recent first
-    '''
-    return get_date(session['DATE'])
 
 float_or_zero = lambda s: float(s) if valid_num(s) else 0
 make_int = lambda n: int(n) if int(n) == n else n
 get_participant_list = lambda participant_str: [val for val in participant_str.split('\n') if val] 
+
+def validate_session_info(values):
+    '''
+    Validate session info: return an error message if there is one or None if not
+    Also returns a tuple of session info
+    '''
+    group_name = values['-GROUP-']
+    date = get_date(values['-DATE-'])
+    duration = values['-DURATION-']
+    participants = get_participant_list(values['-PARTICIPANTS-'])
+    error = None
+    if not group_name:
+        error = 'Group Name is empty'
+    elif not date:
+        error = 'Invalid Date, Please enter in YYYY-MM-DD format'
+    elif not duration or not valid_num(duration):
+        error = 'Please enter a number (in hours) for Duration'
+    elif not participants:
+        error = 'No participants entered'
+    
+    return error, (group_name, date, duration, participants)
+
 def add_session_event_processing(window):
     participants = []
     while True:
@@ -245,22 +269,10 @@ def add_session_event_processing(window):
             duration = make_int(float_or_zero(values['-DURATION-']))
             window['-DURATION-'].update(value=duration+1)
         elif event == 'Submit':
-            group_name = values['-GROUP-']
-            date = get_date(values['-DATE-'])
-            duration = values['-DURATION-']
-            participants = get_participant_list(values['-PARTICIPANTS-'])
-            error = None
-            if not group_name:
-                error = 'Group Name is empty'
-            elif not date:
-                error = 'Invalid Date, Please enter in YYYY-MM-DD format'
-            elif not duration or not valid_num(duration):
-                error = 'Please enter a number (in hours) for Duration'
-            elif not participants:
-                error = 'No participants entered'
-            
+            error, (group_name, date, duration, participants) = validate_session_info(values)
             if error:
                 window['-ERROR-'].update(visible=True, value=error)
+                return False
             else:
                 # Submit the data
                 sessions_list = DATA["SESSIONS"]
@@ -270,7 +282,6 @@ def add_session_event_processing(window):
                     "DURATION_HOURS": float(duration),
                     "ATTENDEES": [name.lower() for name in participants]
                 })
-                sessions_list.sort(key=sessions_key, reverse=True)
                 save_data()
                 # clear form
                 for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
@@ -321,7 +332,6 @@ def edit_session_event_processing(window):
     while True:
         window['-PREV-'].update(disabled=current_session_index == 0) 
         window['-NEXT-'].update(disabled=current_session_index == len(sessions)-1) 
-        session = sessions[current_session_index]
 
         event, values = window.read()
         if event == sg.WIN_CLOSED:
@@ -346,38 +356,26 @@ def edit_session_event_processing(window):
         elif event == '-DURATION_PLUS-':
             duration = make_int(float_or_zero(values['-DURATION-']))
             window['-DURATION-'].update(value=duration+1)
-        elif event == 'Submit':
-            group_name = values['-GROUP-']
-            date = get_date(values['-DATE-'])
-            duration = values['-DURATION-']
-            participants = [val for val in values['-PARTICIPANTS-'].split('\n') if val]
-            error = None
-            if not group_name:
-                error = 'Group Name is empty'
-            elif not date:
-                error = 'Invalid Date, Please enter in YYYY-MM-DD format'
-            elif not duration or not valid_num(duration):
-                error = 'Please enter a number (in hours) for Duration'
-            elif not participants:
-                error = 'No participants entered'
+        elif event == 'Delete':
+            del sessions[current_session_index]
+            save_data()
+            current_session_index = max(0, current_session_index-1)
+            update_window(sessions[current_session_index])
+        elif event == 'Save':
+            error, (group_name, date, duration, participants) = validate_session_info(values)
             
             if error:
                 window['-ERROR-'].update(visible=True, value=error)
             else:
-                # Submit the data
-                sessions_list = DATA["SESSIONS"]
-                sessions_list.append({
+                # Save the data
+                sessions[current_session_index] = {
                     "GROUP_NAME": group_name,
                     "DATE": date,
                     "DURATION_HOURS": float(duration),
                     "ATTENDEES": [name.lower() for name in participants]
-                })
+                }
                 save_data()
-                # clear form
-                for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
-                    window[key].update(value='')
-                window['-DATE-'].update(value=today)
-                window['-DURATION-'].update(value='1')
+                update_window(sessions[current_session_index])
                 participants.clear()
         else:
             window['-ERROR-'].update(visible=False, value='')
