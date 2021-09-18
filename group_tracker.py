@@ -83,6 +83,7 @@ PDF_FONT = {
 
 HOME = 'home'
 ADD_SESSION = 'Add Group Session'
+EDIT_SESSION = 'Edit Group Sessions'
 CREATE_REPORT = 'Create Report'
 ABOUT = 'About'
 WINDOW_TITLE = 'Group Tracker'
@@ -148,6 +149,7 @@ def home_window():
     home_layout = [
         [sg.Text('Peer Support Participant Tracker', **header_text_options)],
         [sg.Button(ADD_SESSION, **button_options)],
+        [sg.Button(EDIT_SESSION, **button_options)],
         [sg.Button(CREATE_REPORT, **button_options)],
         [sg.Button(ABOUT, **button_options)],
         [sg.Button('Quit', **button_options)],
@@ -159,7 +161,7 @@ def home_event_processing(window):
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Quit':
             break
-        elif event in {ADD_SESSION, CREATE_REPORT, ABOUT}:
+        elif event in {ADD_SESSION, EDIT_SESSION, CREATE_REPORT, ABOUT}:
             return event
 
 def last_nonzero_index(inp):
@@ -266,6 +268,81 @@ def add_session_event_processing(window):
                 participants.clear()
         else:
             window['-ERROR-'].update(visible=False, value='')
+
+def edit_session_event_processing(window):
+    participants = []
+    float_or_zero = lambda s: float(s) if valid_num(s) else 0
+    make_int = lambda n: int(n) if int(n) == n else n
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        elif event in ('\r', ENTER):
+            new_participant = values['-PARTICIPANT-']
+            if new_participant:
+                participants.insert(0, new_participant)
+                window['-PARTICIPANTS-'].update(value='\n'.join(participants))
+                window['-PARTICIPANT-'].update(value='')
+        elif event == 'Back':
+            return HOME
+        elif event == '-DURATION_MINUS-':
+            duration = make_int(float_or_zero(values['-DURATION-']))
+            window['-DURATION-'].update(value=max(0, duration-1))
+        elif event == '-DURATION_PLUS-':
+            duration = make_int(float_or_zero(values['-DURATION-']))
+            window['-DURATION-'].update(value=duration+1)
+        elif event == 'Submit':
+            group_name = values['-GROUP-']
+            date = get_date(values['-DATE-'])
+            duration = values['-DURATION-']
+            participants = [val for val in values['-PARTICIPANTS-'].split('\n') if val]
+            error = None
+            if not group_name:
+                error = 'Group Name is empty'
+            elif not date:
+                error = 'Invalid Date, Please enter in YYYY-MM-DD format'
+            elif not duration or not valid_num(duration):
+                error = 'Please enter a number (in hours) for Duration'
+            elif not participants:
+                error = 'No participants entered'
+            
+            if error:
+                window['-ERROR-'].update(visible=True, value=error)
+            else:
+                # Submit the data
+                sessions_list = DATA["SESSIONS"]
+                sessions_list.append({
+                    "GROUP_NAME": group_name,
+                    "DATE": date,
+                    "DURATION_HOURS": float(duration),
+                    "ATTENDEES": [name.lower() for name in participants]
+                })
+                save_data()
+                # clear form
+                for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
+                    window[key].update(value='')
+                window['-DATE-'].update(value=today)
+                window['-DURATION-'].update(value='1')
+                participants.clear()
+        else:
+            window['-ERROR-'].update(visible=False, value='')
+
+def edit_session_window():
+    edit_session_layout = [
+        [sg.Button('Prev', **submit_button_options), sg.Text('Edit a Group Session', **header_text_options), sg.Button('Next', **submit_button_options)],
+        [sg.Text('Group Name:', **label_text_options), sg.InputText(key='-GROUP-', **text_input_options)],
+        [sg.Text('Date:', **label_text_options), 
+            sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
+        [sg.Text('Duration (hours):', **label_text_options), 
+            sg.Button('-', key='-DURATION_MINUS-', **ticker_button_options), 
+            sg.InputText(default_text='1', key='-DURATION-', **number_input_options),
+            sg.Button('+', key='-DURATION_PLUS-', **ticker_button_options)],
+        [sg.Text('Participants:', **label_text_options), sg.InputText(key='-PARTICIPANT-',**text_input_options)],
+        [sg.Multiline(key='-PARTICIPANTS-', **text_input_options)],
+        [sg.Text('', key='-ERROR-', visible=False, **error_text_options)],
+        [sg.Button('Submit', **submit_button_options), sg.Button('Back', **submit_button_options)],        
+    ]
+    return sg.Window(WINDOW_TITLE, edit_session_layout, finalize=True, return_keyboard_events=True, element_justification='c')
             
 def create_report_window():
     create_report_layout = [
@@ -450,6 +527,10 @@ layouts = {
         'window': add_session_window,
         'event_processing': add_session_event_processing,
     },
+    EDIT_SESSION: {
+        'window': edit_session_window,
+        'event_processing': edit_session_event_processing,
+    },
     CREATE_REPORT: {
         'window': create_report_window,
         'event_processing': create_report_event_processing,
@@ -465,6 +546,8 @@ if __name__ == '__main__':
     args = sys.argv
     if 'add-session' in sys.argv:
         current_layout = ADD_SESSION
+    if 'edit-session' in sys.argv:
+        current_layout = EDIT_SESSION
     elif 'create-report' in sys.argv:
         current_layout = CREATE_REPORT
 
