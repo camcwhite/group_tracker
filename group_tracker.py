@@ -337,9 +337,11 @@ def add_session_event_processing(window):
                     "DURATION_HOURS": float(duration),
                     "ATTENDEES": session_attendees 
                 })
-                participant_names = set(DATA["PARTICIPANTS"]).update(session_attendees)
+                participant_names = set(DATA["PARTICIPANTS"])
+                participant_names.update(session_attendees)
                 DATA["PARTICIPANTS"] = list(participant_names)
-                group_names = set(DATA["GROUPS"]).add(group_name)
+                group_names = set(DATA["GROUPS"])
+                group_names.add(group_name)
                 DATA["GROUPS"] = list(group_names)
                 save_data()
                 # clear form
