@@ -212,9 +212,17 @@ def valid_num(num_str):
     except ValueError:
         return False
 
+def sessions_key(session):
+    '''
+    Key func for sorting sessions 
+
+    Currently sorts sessions by date most recent first
+    '''
+    return get_date(session['DATE'])
 
 float_or_zero = lambda s: float(s) if valid_num(s) else 0
 make_int = lambda n: int(n) if int(n) == n else n
+get_participant_list = lambda participant_str: [val for val in participant_str.split('\n') if val] 
 def add_session_event_processing(window):
     participants = []
     while True:
@@ -224,6 +232,7 @@ def add_session_event_processing(window):
         elif event in ('\r', ENTER):
             new_participant = values['-PARTICIPANT-']
             if new_participant:
+                participants = get_participant_list(values['-PARTICIPANTS-'])
                 participants.insert(0, new_participant)
                 window['-PARTICIPANTS-'].update(value='\n'.join(participants))
                 window['-PARTICIPANT-'].update(value='')
@@ -239,7 +248,7 @@ def add_session_event_processing(window):
             group_name = values['-GROUP-']
             date = get_date(values['-DATE-'])
             duration = values['-DURATION-']
-            participants = [val for val in values['-PARTICIPANTS-'].split('\n') if val]
+            participants = get_participant_list(values['-PARTICIPANTS-'])
             error = None
             if not group_name:
                 error = 'Group Name is empty'
@@ -261,6 +270,7 @@ def add_session_event_processing(window):
                     "DURATION_HOURS": float(duration),
                     "ATTENDEES": [name.lower() for name in participants]
                 })
+                sessions_list.sort(key=sessions_key, reverse=True)
                 save_data()
                 # clear form
                 for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
