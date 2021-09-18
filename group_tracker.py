@@ -42,6 +42,10 @@ DB_SCHEMA = {
                 "minProperties": 4,
             }
         },
+        "PARTICIPANTS": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
         "GROUPS": {
             "type": "array",
             "items": {"type": "string"},
@@ -157,6 +161,11 @@ text_box_options = {
     'font': 'arial 20',
 }
 
+combo_box_options = {
+    'size': (15, 5),
+    'font': 'arial 20',
+}
+
 error_text_options = {
     'font': 'arial 20',
     'text_color': 'red',
@@ -198,14 +207,19 @@ last_week = (today_obj - timedelta(weeks=1)).strftime('%Y-%m-%d')
 def add_session_window():
     add_session_layout = [
         [sg.Text('Add a Group Session', **header_text_options)],
-        [sg.Text('Group Name:', **label_text_options), sg.InputText(key='-GROUP-', **text_input_options)],
+        [sg.Text('Group Name:', **label_text_options), 
+            sg.Combo(key='-GROUP-', 
+                    values=DATA["GROUPS"], 
+                    **combo_box_options)],
         [sg.Text('Date:', **label_text_options), 
             sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
         [sg.Text('Duration (hours):', **label_text_options), 
             sg.Button('-', key='-DURATION_MINUS-', **ticker_button_options), 
             sg.InputText(default_text='1', key='-DURATION-', **number_input_options),
             sg.Button('+', key='-DURATION_PLUS-', **ticker_button_options)],
-        [sg.Text('Participants:', **label_text_options), sg.InputText(key='-PARTICIPANT-',**text_input_options)],
+        [sg.Text('Participants:', **label_text_options), 
+            sg.Combo(key='-PARTICIPANT-', 
+            values=DATA["PARTICIPANTS"], **combo_box_options)],
         [sg.Multiline(key='-PARTICIPANTS-', **text_input_options)],
         [sg.Text('', key='-ERROR-', visible=False, **error_text_options)],
         [sg.Button('Submit', **submit_button_options), sg.Button('Back', **submit_button_options)],        
@@ -284,12 +298,15 @@ def add_session_event_processing(window):
             else:
                 # Submit the data
                 sessions_list = DATA["SESSIONS"]
+                session_attendees = [name.lower() for name in participants]
                 sessions_list.append({
                     "GROUP_NAME": group_name,
                     "DATE": date,
                     "DURATION_HOURS": float(duration),
-                    "ATTENDEES": [name.lower() for name in participants]
+                    "ATTENDEES": session_attendees 
                 })
+                participant_names = set(DATA["PARTICIPANTS"]).update(session_attendees)
+                DATA["PARTICIPANTS"] = list(participant_names)
                 group_names = set(DATA["GROUPS"]).add(group_name)
                 DATA["GROUPS"] = list(group_names)
                 save_data()
@@ -378,12 +395,16 @@ def edit_session_event_processing(window):
                 window['-ERROR-'].update(visible=True, value=error)
             else:
                 # Save the data
+                session_attendees = [name.lower() for name in participants]
                 sessions[current_session_index] = {
                     "GROUP_NAME": group_name,
                     "DATE": date,
                     "DURATION_HOURS": float(duration),
-                    "ATTENDEES": [name.lower() for name in participants]
+                    "ATTENDEES": session_attendees, 
                 }
+                participant_names = set(DATA["PARTICIPANTS"])
+                participant_names.update(session_attendees)
+                DATA["PARTICIPANTS"] = list(participant_names)
                 group_names = set(DATA["GROUPS"])
                 group_names.add(group_name)
                 DATA["GROUPS"] = list(group_names)
