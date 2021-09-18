@@ -41,7 +41,11 @@ DB_SCHEMA = {
                 "additionalProperties": False,
                 "minProperties": 4,
             }
-        }
+        },
+        "GROUPS": {
+            "type": "array",
+            "items": {"type": "string"},
+        },
     }
 }
 
@@ -254,6 +258,7 @@ def add_session_event_processing(window):
     participants = []
     while True:
         event, values = window.read()
+        print(event, values)
         if event == sg.WIN_CLOSED:
             break
         elif event in ('\r', ENTER):
@@ -285,6 +290,8 @@ def add_session_event_processing(window):
                     "DURATION_HOURS": float(duration),
                     "ATTENDEES": [name.lower() for name in participants]
                 })
+                group_names = set(DATA["GROUPS"]).add(group_name)
+                DATA["GROUPS"] = list(group_names)
                 save_data()
                 # clear form
                 for key in ('-GROUP-', '-PARTICIPANT-', '-PARTICIPANTS-'):
@@ -377,6 +384,9 @@ def edit_session_event_processing(window):
                     "DURATION_HOURS": float(duration),
                     "ATTENDEES": [name.lower() for name in participants]
                 }
+                group_names = set(DATA["GROUPS"])
+                group_names.add(group_name)
+                DATA["GROUPS"] = list(group_names)
                 save_data()
                 update_window(sessions[current_session_index])
                 participants.clear()
