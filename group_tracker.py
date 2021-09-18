@@ -75,6 +75,7 @@ PDF_FONT = {
 HOME = 'home'
 ADD_SESSION = 'Add Group Session'
 CREATE_REPORT = 'Create Report'
+ABOUT = 'About'
 WINDOW_TITLE = 'Group Tracker'
 
 
@@ -139,6 +140,7 @@ def home_window():
         [sg.Text('Peer Support Participant Tracker', **header_text_options)],
         [sg.Button(ADD_SESSION, **button_options)],
         [sg.Button(CREATE_REPORT, **button_options)],
+        [sg.Button(ABOUT, **button_options)],
         [sg.Button('Quit', **button_options)],
     ]
     return sg.Window(WINDOW_TITLE, home_layout, finalize=True, return_keyboard_events=True, element_justification='c')
@@ -148,10 +150,8 @@ def home_event_processing(window):
         event, values = window.read()
         if event == sg.WIN_CLOSED or event == 'Quit':
             break
-        elif event == ADD_SESSION:
-            return ADD_SESSION
-        elif event == CREATE_REPORT:
-            return CREATE_REPORT
+        elif event in {ADD_SESSION, CREATE_REPORT, ABOUT}:
+            return event
 
 def last_nonzero_index(inp):
     '''
@@ -390,6 +390,23 @@ def create_report_event_processing(window):
                     report_save_funcs[_type](report, values[_type])
                     return HOME
 
+def about_window():
+    about_layout = [
+        [sg.Text('About', **header_text_options)],
+        [sg.Text('This app was made, with love, for River City Advocacy', **label_text_options)],
+        [sg.Text('by Renee and Cameron White', **label_text_options)],
+        [sg.Button('Back', **submit_button_options)],
+    ] 
+    return sg.Window(WINDOW_TITLE, about_layout, finalize=True, return_keyboard_events=True, element_justification='c')
+
+def about_event_processing(window):
+    while True:
+        event, values = window.read()
+        if event == sg.WIN_CLOSED:
+            break
+        elif event == 'Back':
+            return HOME
+
 layouts = {
     HOME: {
         'window': home_window,
@@ -402,6 +419,10 @@ layouts = {
     CREATE_REPORT: {
         'window': create_report_window,
         'event_processing': create_report_event_processing,
+    },
+    ABOUT: {
+        'window': about_window,
+        'event_processing': about_event_processing,
     }
 }
 
