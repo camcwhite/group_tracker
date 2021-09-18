@@ -410,7 +410,9 @@ def edit_session_event_processing(window):
                 new_participant = prediction_list[0]
 
             if new_participant:
+                participants = get_participant_list(values['-PARTICIPANTS-'])
                 participants.insert(0, new_participant)
+                print(participants)
                 window['-PARTICIPANTS-'].update(value='\n'.join(participants))
                 window['-PARTICIPANT-'].update(value='')
                 window['-PARTICIPANT-'].TKCombo.event_generate('<Escape>')
