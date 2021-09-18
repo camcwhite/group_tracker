@@ -1,3 +1,5 @@
+__version__ = "1.1 Alpha"
+
 import PySimpleGUI as sg
 import calendar
 from datetime import datetime, timedelta
