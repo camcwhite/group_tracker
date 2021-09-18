@@ -213,7 +213,9 @@ def add_session_window():
                     enable_events=True,
                     **combo_box_options)],
         [sg.Text('Date:', **label_text_options), 
-            sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
+            sg.Button('-', key='-DATE_MINUS-', **ticker_button_options), 
+            sg.InputText(default_text=today, key='-DATE-', **date_input_options),
+            sg.Button('+', key='-DATE_PLUS-', **ticker_button_options)],
         [sg.Text('Duration (hours):', **label_text_options), 
             sg.Button('-', key='-DURATION_MINUS-', **ticker_button_options), 
             sg.InputText(default_text='1', key='-DURATION-', **number_input_options),
@@ -228,6 +230,7 @@ def add_session_window():
     return sg.Window(WINDOW_TITLE, add_session_layout, finalize=True, return_keyboard_events=True, element_justification='c')
 
 ENTER = 'Return:603979789'
+ONE_DAY = timedelta(days=1)
 
 def get_date(date_str):
     try:
@@ -301,6 +304,18 @@ def add_session_event_processing(window):
         elif event == '-DURATION_PLUS-':
             duration = make_int(float_or_zero(values['-DURATION-']))
             window['-DURATION-'].update(value=duration+1)
+        elif event == '-DATE_MINUS-':
+            date_str = get_date(values['-DATE-'])
+            if not date_str:
+                date_str = today
+            
+            window['-DATE-'].update(value=(datetime.strptime(date_str, '%Y-%m-%d') - ONE_DAY).strftime('%Y-%m-%d'))
+        elif event == '-DATE_PLUS-':
+            date_str = get_date(values['-DATE-'])
+            if not date_str:
+                date_str = today
+            
+            window['-DATE-'].update(value=(datetime.strptime(date_str, '%Y-%m-%d') + ONE_DAY).strftime('%Y-%m-%d'))
         elif event == 'Submit':
             error, (group_name, date, duration, participants) = validate_session_info(values)
             if error:
@@ -361,7 +376,9 @@ def edit_session_window():
         [sg.Text('', key='-SESSION_COUNT-', **label_text_options)],
         [sg.Text('Group Name:', **label_text_options), sg.Combo(key='-GROUP-', values=DATA["GROUPS"], **combo_box_options)],
         [sg.Text('Date:', **label_text_options), 
-            sg.InputText(default_text=today, key='-DATE-', **date_input_options)],
+            sg.Button('-', key='-DATE_MINUS-', **ticker_button_options), 
+            sg.InputText(default_text=today, key='-DATE-', **date_input_options),
+            sg.Button('+', key='-DATE_PLUS-', **ticker_button_options)], 
         [sg.Text('Duration (hours):', **label_text_options), 
             sg.Button('-', key='-DURATION_MINUS-', **ticker_button_options), 
             sg.InputText(default_text='1', key='-DURATION-', **number_input_options),
@@ -432,6 +449,18 @@ def edit_session_event_processing(window):
         elif event == '-DURATION_PLUS-':
             duration = make_int(float_or_zero(values['-DURATION-']))
             window['-DURATION-'].update(value=duration+1)
+        elif event == '-DATE_MINUS-':
+            date_str = get_date(values['-DATE-'])
+            if not date_str:
+                date_str = today
+            
+            window['-DATE-'].update(value=(datetime.strptime(date_str, '%Y-%m-%d') - ONE_DAY).strftime('%Y-%m-%d'))
+        elif event == '-DATE_PLUS-':
+            date_str = get_date(values['-DATE-'])
+            if not date_str:
+                date_str = today
+            
+            window['-DATE-'].update(value=(datetime.strptime(date_str, '%Y-%m-%d') + ONE_DAY).strftime('%Y-%m-%d'))
         elif event == 'Delete':
             del sessions[current_session_index]
             save_data()
