@@ -55,6 +55,13 @@ DB_SCHEMA = {
     }
 }
 
+schema_type_map = {
+    "string": str,
+    "array": list,
+    "number": float,
+    "object": dict,
+}
+
 def load_data(second_try=False):
     global DATA
     try:
@@ -72,10 +79,7 @@ def load_data(second_try=False):
         elif type(err) is not FileNotFoundError:
             copyfile(DB_FILENAME, new_file_path)
         print('Generating new data.json')
-        DATA = {
-            "LAST_SAVED": "null",
-            "SESSIONS": [],
-        }
+        DATA = {prop: schema_type_map[DB_SCHEMA['properties'][prop]['type']]() for prop in DB_SCHEMA['properties']}
         save_data()
         load_data(second_try=True)
 
@@ -645,6 +649,9 @@ report_save_funcs = {
 }
 
 def create_report_event_processing(window):
+    if not DATA["SESSIONS"]:
+        return ERROR
+
     while True:
         event, values = window.read()
         if event == sg.WIN_CLOSED:
