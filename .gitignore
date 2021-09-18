@@ -6,3 +6,4 @@ __pycache__
 *.spec
 RCA_Peer_Support_Data
 report.*
+group_tracker2.py
