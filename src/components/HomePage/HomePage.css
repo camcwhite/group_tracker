@@ -7,10 +7,6 @@
   gap: 20px;
 }
 
-.HomePage > h1 {
-  font-size: clamp(2vw, 8rem, 5vw);
-}
-
 .HomePage img {
   width: 30%;
   max-width: 150px;
@@ -22,4 +18,8 @@
 .home-page-button {
   width: 40%;
   max-width: 300px;
+}
+
+.home-page-button:hover {
+  padding: 0 24px;
 }

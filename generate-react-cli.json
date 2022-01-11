@@ -4,11 +4,16 @@
   "testLibrary": "None",
   "component": {
     "default": {
+      "customTemplates": {
+        "component": "templates/TemplateName.tsx",
+        "style": "templates/TemplateName.css"
+      },
       "path": "src/components",
       "withStyle": true,
       "withTest": false,
       "withStory": false,
       "withLazy": false
     }
-  }
+  },
+  "usesCssModule": false
 }

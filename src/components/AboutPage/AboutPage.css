@@ -1,0 +1,22 @@
+.AboutPage {
+  gap: 50px;
+}
+
+.about-text-container {
+  text-align: center;
+  font-size: clamp(.125vw, 2rem, 2.5vw);
+}
+
+.usage-instructions {
+  width: 50%;
+  max-width: 600px;
+  font-size: 18px;
+}
+
+.usage-instructions > li {
+  margin-top: 10px;
+}
+
+.AboutPage > small {
+  margin-bottom: 50px;
+}

@@ -1,6 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
-
-const { session } = require('electron')
+const { app, BrowserWindow, ipcMain, session, shell } = require('electron')
 
 require('@electron/remote/main').initialize()
 
@@ -16,6 +14,10 @@ function createWindow() {
     },
   })
   win.maximize()
+  win.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url)
+    return { action: 'deny' }
+  });
   win.loadURL('http://localhost:3000')
 }
 
@@ -41,5 +43,4 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-console.log('in main');
 ipcMain.on('quit', () => app.quit());
