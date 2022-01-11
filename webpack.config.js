@@ -36,7 +36,7 @@ module.exports = {
     }),
     new MiniCssExtractPlugin(),
   ],
-  target: 'node',
+  // target: 'node',
   // resolve: {
   //   alias: {
   //     "path": "path-browserify",
