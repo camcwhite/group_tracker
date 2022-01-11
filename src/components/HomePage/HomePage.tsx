@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import rca_logo from '../../assets/rca_logo.png';
 import './HomePage.css';
+import { motion } from 'framer-motion';
 
 const homeButtons = new Map([
   ['Add Group Sessions', '/add-session'],
@@ -12,7 +13,7 @@ const homeButtons = new Map([
 
 const HomePage = () => {
 
-  const quit = (ev:React.MouseEvent) => {
+  const quit = (ev: React.MouseEvent) => {
     ev.preventDefault();
     window.postMessage('quitApp');
   };

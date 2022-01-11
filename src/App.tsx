@@ -1,21 +1,36 @@
 import React from "react";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./components/HomePage/HomePage";
 import './App.css';
 import AboutPage from "./components/AboutPage/AboutPage";
 import AppHeader from "./components/AppHeader/AppHeader";
+import { AnimatePresence, motion } from "framer-motion";
+
+const TransitionPage = (PageElement: () => JSX.Element, props?: JSX.IntrinsicAttributes): JSX.Element => {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: .6 }}
+    >
+      <PageElement {...props} />
+    </motion.div>
+  )
+}
 
 const App = () => {
+  const location = useLocation();
   return (
-    <HashRouter>
-      <div className="App">
-        <AppHeader />
-        <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/about' element={<AboutPage />} />
+    <div className="App">
+      <AnimatePresence exitBeforeEnter initial={false}>
+        {location.pathname === '/' ? null : TransitionPage(AppHeader)}
+        <Routes location={location} key={location.pathname}>
+          <Route path='/' element={TransitionPage(HomePage)} />
+          <Route path='/about' element={TransitionPage(AboutPage)} />
         </Routes>
-      </div>
-    </HashRouter >
+      </AnimatePresence>
+    </div>
   )
 };
 

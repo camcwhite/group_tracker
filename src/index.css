@@ -65,6 +65,11 @@ button {
   border-color: var(--background-secondary);
 }
 
+@keyframes show-page {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 .page {
   display: flex;
   flex-direction: column;

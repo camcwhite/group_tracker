@@ -1,13 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './AppHeader.css';
+import { motion } from 'framer-motion';
 
 const AppHeader = () => {
   const location = useLocation();
-
-  if (location.pathname === '/') {
-    return null;
-  }
 
   return (
     <div className="AppHeader">
