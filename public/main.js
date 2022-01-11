@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcRenderer } = require('electron')
 
 require('@electron/remote/main').initialize()
 
@@ -25,3 +25,5 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
+
+ipcRenderer.on('quit', () => app.quit());

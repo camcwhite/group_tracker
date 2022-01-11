@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+// import { ipcRenderer } from 'electron';
 import rca_logo from '../../assets/rca_logo.png';
 import './HomePage.css';
 
@@ -12,8 +13,9 @@ const homeButtons = new Map([
 
 const HomePage = () => {
 
-  const quit = () => {
-
+  const quit = (ev:React.MouseEvent) => {
+    ev.preventDefault();
+    // ipcRenderer.send('quit');
   };
 
   return (
