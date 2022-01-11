@@ -1,0 +1,52 @@
+@font-face {
+  font-family: "Varela Round";
+  src: url("./assets/fonts/VarelaRound.ttf");
+}
+
+:root {
+  --background-primary: #008080;
+  --background-secondary: #fff;
+  --dark-primary: #003636;
+  --font-primary: #fff;
+  --font-secondary: #008080;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Varela Round";
+  font-weight: bold;
+  color: var(--font-primary);
+  text-shadow: var(--dark-primary) 5px 5px;
+}
+
+button {
+  padding: 0;
+}
+
+.button, button {
+  box-sizing: content-box;
+  height: 50px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  text-decoration: none;
+  border: 2px solid var(--dark-primary);
+  border-radius: 10px;
+  background-color: var(--background-secondary);
+  color: var(--font-secondary);
+  font-family: "Varela Round";
+  font-weight: bold;
+
+  position: relative;
+  cursor: pointer;
+  transition: 500ms;
+}
+
+.button:hover, button:hover {
+  padding: 0 24px;
+  background-color: var(--background-secondary);
+  color: var(--font-secondary);
+}
