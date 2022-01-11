@@ -24,6 +24,7 @@ const HomePage = () => {
       {Array.from(homeButtons.entries())
         .map(([buttonName, buttonLink], index) => (
           <Link
+            key={index}
             className='button home-page-button'
             to={buttonLink}
           >

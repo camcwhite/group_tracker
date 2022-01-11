@@ -1,54 +1,47 @@
 {
   "name": "rca_group_tracker",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@electron/remote": "^2.0.1",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/react": "^12.1.2",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.4.0",
-    "@types/node": "^16.11.19",
-    "@types/react": "^17.0.38",
-    "@types/react-dom": "^17.0.11",
-    "concurrently": "^7.0.0",
-    "cross-env": "^7.0.3",
-    "electron": "^16.0.6",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-router-dom": "^6.2.1",
-    "react-scripts": "5.0.0",
-    "typescript": "^4.5.4",
-    "wait-on": "^6.0.0",
-    "web-vitals": "^2.1.3"
-  },
+  "version": "0.2.0",
+  "description": "This is a simple app built using that tracks participation in group sessions and generates reports from that data.",
   "main": "public/main.js",
   "homepage": "./",
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "electron-serve": "concurrently -k \"cross-env BROWSER=none npm run start\" \" npm run electron-start\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack serve --port 3000",
+    "build": "NODE_ENV=production webpack",
+    "electron-dev": "concurrently -k \"cross-env BROWSER=none npm run start\" \" npm run electron-start\"",
     "electron-build": "",
     "electron-start": "wait-on tcp:3000 && electron ."
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whiteceric/group_tracker.git"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "author": "Cameron White",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/whiteceric/group_tracker/issues"
+  },
+  "dependencies": {
+    "@electron/remote": "^2.0.1",
+    "concurrently": "^7.0.0",
+    "cross-env": "^7.0.3",
+    "electron": "^16.0.6",
+    "path-browserify": "^1.0.1",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-router-dom": "^6.2.1",
+    "wait-on": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.38",
+    "@types/react-dom": "^17.0.11",
+    "css-loader": "^6.5.1",
+    "html-webpack-plugin": "^5.5.0",
+    "mini-css-extract-plugin": "^2.4.6",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
+    "webpack": "^5.65.0",
+    "webpack-cli": "^4.9.1",
+    "webpack-dev-server": "^4.7.2"
   }
 }

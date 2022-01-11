@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcRenderer } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 
 require('@electron/remote/main').initialize()
 
@@ -8,6 +8,9 @@ function createWindow () {
     height: 600,
     webPreferences: {
       enableRemoteModule: true,
+      nodeIntegration: true,
+      contextIsolation: false,
+      // preload: './preload.js',
     },
   })
   win.maximize()
@@ -26,4 +29,4 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-ipcRenderer.on('quit', () => app.quit());
+// ipcMain.on('quit', () => app.quit());
