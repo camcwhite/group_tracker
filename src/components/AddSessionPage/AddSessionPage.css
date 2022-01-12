@@ -1,0 +1,18 @@
+.AddSessionPage {}
+
+.AddSessionPage > form > label,
+.search-drop-down {
+  font-size: clamp(1vw, 2rem, 3vw);
+}
+
+.AddSessionPage > form > label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px
+}
+
+.AddSessionPage > form > label > datalist > option {
+  background-color: tomato;
+}
