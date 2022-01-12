@@ -12,6 +12,7 @@ type DropDownStyle = {
 
 type SearchDropDownProps = {
   options: string[],
+  value: string,
   onChange: (newValue: string) => void,
   className?: string,
   placeholder?: string,
@@ -28,10 +29,10 @@ const defaultDropDownStyle:DropDownStyle = {
 };
 
 const SearchDropDown = (
-  { options, onChange, className, placeholder, dropDownStyle }:
+  { options, value, onChange, className, placeholder, dropDownStyle }:
  SearchDropDownProps) => {
   const [showing, setShowing] = useState(false);
-  const [value, setValue] = useState('');
+  // const [value, setValue] = useState('');
   const [dropDownOptions, setDropDownOptions] = useState(options)
 
   const handleEscapeKey = (ev: KeyboardEvent) => {
@@ -49,7 +50,6 @@ const SearchDropDown = (
   }, []);
 
   const handleValueChange = (newValue: string) => {
-    setValue(newValue);
     onChange(newValue);
     const newOptions = options.filter(str => str.toLowerCase().startsWith(newValue.toLowerCase()));
     if (newOptions.length > 0 && !showing) {

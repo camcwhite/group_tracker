@@ -1,4 +1,6 @@
-.AddSessionPage {}
+.AddSessionPage {
+  margin-bottom: 200px;
+}
 
 .AddSessionPage > form > label,
 .AddSessionPage > form > label > input,
@@ -44,5 +46,82 @@
   align-self: center;
   margin-top: 20px;
   font-size: 20px;
+  width: 30%;
   padding: 5px 20px;
+}
+
+.add-participant-button:hover {
+  padding: 5px 30px;
+}
+
+.AddSessionPage > h3 {
+  margin-top: 50px;
+}
+
+.participant-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 60%;
+  gap: 15px;
+}
+
+.participant-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: content-box;
+  padding: 0 20px;
+  width: 80%;
+  background-color: var(--background-secondary);
+  border: 2px solid var(--dark-primary);
+  border-radius: 10px;
+}
+
+.participant-container > input[type="text"] {
+  width: 100%;
+  color: var(--font-secondary);
+  border: none;
+  font-size: 24px;
+}
+
+.participant-container > input[type="text"]:focus {
+  outline: none;
+}
+
+.participant-container > .remove-participant {
+  width: 10%;
+  background: none; 
+  border: none;
+  color: var(--font-secondary);
+  font-size: 24px;
+}
+
+.participant-item-exit-active {
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+
+.participant-item-enter-active {
+  opacity: 1;
+  transition: opacity 700ms ease-in;
+}
+
+.participant-item-enter {
+  opacity: 0;
+}
+
+/* .participant-item-exit {
+  opacity: 1;
+  transition: opacity 700ms ease-in;
+} */
+
+.submit-session-button {
+  font-size: 24px;
+  width: 30%;
+  margin-top: 50px;
+  margin-bottom: 20px;
 }

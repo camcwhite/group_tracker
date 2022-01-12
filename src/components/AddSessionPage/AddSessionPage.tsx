@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import SearchDropDown from "../SearchDropDown/SearchDropDown";
+import { TransitionGroup, CSSTransition } from "react-transition-group";
+
 import './AddSessionPage.css';
 
 const groupNameSuggestions = [
@@ -15,6 +17,8 @@ const participantSuggestions = [
   'BC',
   'BAC',
 ];
+
+
 
 const AddSessionPage = () => {
 
@@ -38,11 +42,16 @@ const AddSessionPage = () => {
 
   const [currentParticipant, setCurrentParticipant] = useState('');
 
-  const addParticipant = () => {
-    setParticipants([...participants, currentParticipant])
+  const addParticipant = (name: string) => {
+    if (name.length !== 0) {
+      setCurrentParticipant('');
+      setParticipants([name, ...participants])
+    }
   };
 
-  const [participants, setParticipants] = useState<string[]>([]);
+  const [participants, setParticipants] = useState<string[]>([
+    'Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6',
+  ]);
 
   return (
     <div className="page AddSessionPage">
@@ -53,6 +62,7 @@ const AddSessionPage = () => {
           <SearchDropDown
             className="search-drop-down"
             options={groupNameSuggestions}
+            value={groupName}
             onChange={setGroupName}
           />
         </label>
@@ -73,7 +83,7 @@ const AddSessionPage = () => {
             className="number-input"
             type='number'
             value={duration}
-            step={0.5} 
+            step={0.5}
             min={0}
             onChange={ev => {
               setDuration(parseFloat(ev.target.value))
@@ -81,20 +91,50 @@ const AddSessionPage = () => {
           />
         </label>
         <label>
-          Participants:
+          Add Participant:
           <SearchDropDown
             className="search-drop-down"
+            value={currentParticipant}
             options={participantSuggestions}
             onChange={setCurrentParticipant}
           />
         </label>
-        <button 
+        <button
           className="add-participant-button"
-          onClick={addParticipant}
+          onClick={() => addParticipant(currentParticipant)}
         >
-          Add Participant
+          Add
         </button>
       </form>
+      <h3>Participants</h3>
+      {participants.length === 0 ? <p>No Participants</p> :
+        <div className="participant-section">
+          {participants.map((name, index) => (
+            <div className="participant-container">
+              <input
+                type='text'
+                value={participants[index]}
+                onChange={ev => setParticipants(
+                  participants.map((_name, _index) =>
+                    index === _index ? ev.target.value : _name
+                  )
+                )}
+              />
+              <button
+                className="remove-participant"
+                // onClick={() => removeParticipant(index)}
+                onClick={() =>
+                  setParticipants(participants.filter((_, _index) =>
+                    index !== _index))}
+              >
+                &#10005;
+              </button>
+            </div>
+          ))}
+        </div>
+      }
+
+      <button className="submit-session-button">Submit</button>
     </div >
   );
 };
