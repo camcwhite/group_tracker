@@ -1,0 +1,140 @@
+.SessionForm {
+  width: 100%;
+}
+
+.SessionForm > form > label,
+.SessionForm > form > label > input,
+.search-drop-down {
+  font-size: clamp(1vw, 2rem, 3vw);
+}
+
+.SessionForm > form > label > input {
+  text-align: right;
+}
+
+.SessionForm > form > label > .number-input {
+  width: 10%;
+}
+
+.SessionForm > form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 70%;
+  max-width: 800px;
+  gap: 20px;
+}
+
+.SessionForm > form > label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+.SessionForm > form > label > .number-picker-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-participant-button {
+  align-self: center;
+  margin-top: 20px;
+  font-size: 20px;
+  width: 30%;
+  padding: 5px 20px;
+}
+
+.add-participant-button:hover {
+  padding: 5px 30px;
+}
+
+.SessionForm > h3 {
+  margin-top: 50px;
+}
+
+.participant-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 60%;
+  gap: 15px;
+}
+
+.participant-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  box-sizing: content-box;
+  padding: 0 20px;
+  width: 80%;
+  background-color: var(--background-secondary);
+  border: 2px solid var(--dark-primary);
+  border-radius: 10px;
+}
+
+.participant-container > input[type="text"] {
+  width: 100%;
+  color: var(--font-secondary);
+  border: none;
+  font-size: 24px;
+}
+
+.participant-container > input[type="text"]:focus {
+  outline: none;
+}
+
+.participant-container > .remove-participant {
+  width: 10%;
+  background: none; 
+  border: none;
+  color: var(--font-secondary);
+  font-size: 24px;
+}
+
+.participant-item-exit-active {
+  opacity: 0;
+  transition: opacity 700ms ease-out;
+}
+
+.participant-item-enter-active {
+  opacity: 1;
+  transition: opacity 700ms ease-in;
+}
+
+.participant-item-enter {
+  opacity: 0;
+}
+
+/* .participant-item-exit {
+  opacity: 1;
+  transition: opacity 700ms ease-in;
+} */
+
+.submit-session-buttons-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  width: 100%;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+
+.submit-session-button {
+  font-size: 24px;
+  width: min-content;
+}
+
+.submit-session-button:hover {
+  padding: 0 50px;
+}

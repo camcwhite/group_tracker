@@ -14,6 +14,7 @@ type SearchDropDownProps = {
   options: string[],
   value: string,
   onChange: (newValue: string) => void,
+  onSubmit?: () => void,
   className?: string,
   placeholder?: string,
   width?: string,
@@ -29,13 +30,13 @@ const defaultDropDownStyle:DropDownStyle = {
 };
 
 const SearchDropDown = (
-  { options, value, onChange, className, placeholder, dropDownStyle }:
+  { options, value, onChange, onSubmit, className, placeholder, dropDownStyle }:
  SearchDropDownProps) => {
   const [showing, setShowing] = useState(false);
   // const [value, setValue] = useState('');
   const [dropDownOptions, setDropDownOptions] = useState(options)
 
-  const handleEscapeKey = (ev: KeyboardEvent) => {
+  const handleKeyPress = (ev: KeyboardEvent) => {
     if (ev.key === 'Escape') {
       setShowing(false);
     }
@@ -46,7 +47,10 @@ const SearchDropDown = (
 
 
   useEffect(() => {
-    document.addEventListener("keydown", handleEscapeKey, false);
+    document.addEventListener("keydown", handleKeyPress);
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    }
   }, []);
 
   const handleValueChange = (newValue: string) => {
