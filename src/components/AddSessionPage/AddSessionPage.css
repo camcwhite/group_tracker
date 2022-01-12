@@ -1,18 +1,48 @@
 .AddSessionPage {}
 
 .AddSessionPage > form > label,
+.AddSessionPage > form > label > input,
 .search-drop-down {
   font-size: clamp(1vw, 2rem, 3vw);
+}
+
+.AddSessionPage > form > label > input {
+  text-align: right;
+}
+
+.AddSessionPage > form > label > .number-input {
+  width: 10%;
+}
+
+.AddSessionPage > form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 70%;
+  max-width: 800px;
+  gap: 20px;
 }
 
 .AddSessionPage > form > label {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  width: 100%;
   gap: 10px
 }
 
-.AddSessionPage > form > label > datalist > option {
-  background-color: tomato;
+.AddSessionPage > form > label > .number-picker-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.add-participant-button {
+  align-self: center;
+  margin-top: 20px;
+  font-size: 20px;
+  padding: 5px 20px;
 }

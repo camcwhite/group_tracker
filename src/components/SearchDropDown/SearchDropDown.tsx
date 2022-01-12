@@ -14,6 +14,8 @@ type SearchDropDownProps = {
   options: string[],
   onChange: (newValue: string) => void,
   className?: string,
+  placeholder?: string,
+  width?: string,
   dropDownStyle?: DropDownStyle,
 }
 
@@ -25,7 +27,9 @@ const defaultDropDownStyle:DropDownStyle = {
   fontSize: "18px",
 };
 
-const SearchDropDown = ({ options, onChange, className, dropDownStyle }: SearchDropDownProps) => {
+const SearchDropDown = (
+  { options, onChange, className, placeholder, dropDownStyle }:
+ SearchDropDownProps) => {
   const [showing, setShowing] = useState(false);
   const [value, setValue] = useState('');
   const [dropDownOptions, setDropDownOptions] = useState(options)
@@ -62,11 +66,15 @@ const SearchDropDown = ({ options, onChange, className, dropDownStyle }: SearchD
   }
 
   return (
-    <div ref={wrapperRef} className={`${className} _search-drop-down-container`}>
+    <div 
+      ref={wrapperRef} 
+      className='_search-drop-down-container'
+    >
       <div className={`${className} _search-bar-row`}>
         <input
           className={className}
           type='text'
+          placeholder={placeholder ? placeholder : ""}
           value={value}
           onChange={ev => handleValueChange(ev.target.value)}
         />
