@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import SearchDropDown from "../SearchDropDown/SearchDropDown";
 import { TransitionGroup, CSSTransition } from "react-transition-group";
-
+import { SessionInfo } from "../../sessions";
 import './AddSessionPage.css';
-import SessionForm, { SessionInfo } from "../SessionForm/SessionForm";
-
-
+import SessionForm from "../SessionForm/SessionForm";
 
 const AddSessionPage = () => {
 

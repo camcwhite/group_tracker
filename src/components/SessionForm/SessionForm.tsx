@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SearchDropDown from "../SearchDropDown/SearchDropDown";
+import { EMPTY_SESSION, SessionInfo, getSession } from "../../sessions";
 import './SessionForm.css';
 
 const groupNameSuggestions = [
@@ -16,38 +17,9 @@ const participantSuggestions = [
   'BA123C',
 ];
 
-/**
- * Get the current date as a string
- * 
- * @returns the current date in YYYY-MM-DD
- */
-export const getTodayStr = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const raw_month = today.getMonth() + 1;
-  const month = raw_month >= 10 ? `${raw_month}` : `0${raw_month}`;
-  const raw_day = today.getDate();
-  const day = raw_day >= 10 ? `${raw_day}` : `0${raw_day}`;
-  return `${year}-${month}-${day}`;
-}
-
-export type SessionInfo = {
-  groupName: string,
-  dateStr: string,
-  duration: number,
-  participants: string[],
-};
-
 type SessionFormProps = {
   sessionInfo: SessionInfo,
   buttons: Array<[string, (sessionInfo: SessionInfo) => void]>,
-};
-
-const EMPTY_SESSION: SessionInfo = {
-  groupName: '',
-  dateStr: getTodayStr(), 
-  duration: 1,
-  participants: [],
 };
 
 const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
@@ -75,7 +47,11 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
 
   const getSessionInfo = (): SessionInfo => {
     return {
-      groupName, dateStr, duration, participants
+      sessionID: sessionInfo.sessionID,
+      groupName, 
+      dateStr, 
+      duration, 
+      participants,
     };
   };
 
