@@ -139,7 +139,7 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
               <motion.div
                 key={id}
                 className="participant-container"
-                variants={itemVariants}
+                layout
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
