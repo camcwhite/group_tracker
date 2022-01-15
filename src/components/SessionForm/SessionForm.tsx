@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SearchDropDown from "../SearchDropDown/SearchDropDown";
 import { EMPTY_SESSION, SessionInfo, getSession } from "../../sessions";
 import './SessionForm.css';
+import { AnimatePresence, motion } from "framer-motion";
 
 const groupNameSuggestions = [
   'A',
@@ -30,9 +31,13 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
 
   const [duration, setDuration] = useState(sessionInfo.duration);
 
-  const [participants, setParticipants] = useState<string[]>(
-    sessionInfo.participants
+  const [participants, setParticipants] = useState<{ name: string, id: number }[]>(
+    sessionInfo.participants.map((name, index) => {
+      return { name, id: index + 1 }
+    })
   );
+
+  const [idCounter, setIDCounter] = useState(sessionInfo.participants.length + 1);
 
   const [currentParticipant, setCurrentParticipant] = useState('');
 
@@ -41,36 +46,39 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
     if (name.length !== 0) {
       console.log('adding', name);
       setCurrentParticipant('');
-      setParticipants([name, ...participants])
+      setParticipants([{ name, id: idCounter }, ...participants]);
+      setIDCounter(idCounter + 1);
     }
   };
 
   const getSessionInfo = (): SessionInfo => {
     return {
       sessionID: sessionInfo.sessionID,
-      groupName, 
-      dateStr, 
-      duration, 
-      participants,
+      groupName,
+      dateStr,
+      duration,
+      participants: participants.map(({ name }) => name),
     };
   };
 
-  const handleKeyPress = (ev:KeyboardEvent) => {
+  const handleKeyPress = (ev: React.KeyboardEvent) => {
     if (ev.key === 'Enter') {
       ev.preventDefault();
       addParticipant(currentParticipant);
     }
   }
 
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyPress);
-    return () => {
-      document.removeEventListener('keydown', handleKeyPress);
-    }
-  }, []);
+  const itemVariants = {
+    hidden: {
+      opacity: 0,
+      scale: 0.8,
+      transition: { type: "spring", bounce: 0.4 }
+    },
+    show: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4 } }
+  };
 
   return (
-    <div className="page SessionForm">
+    <div className="page SessionForm" onKeyPress={handleKeyPress}>
       <form>
         <label>
           Group Name:
@@ -124,36 +132,45 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
         </button>
       </form>
       <h3>Participants</h3>
-      {participants.length === 0 ? <p>No Participants</p> :
-        <div className="participant-section">
-          {participants.map((name, index) => (
-            <div key={index} className="participant-container">
-              <input
-                type='text'
-                value={participants[index]}
-                onChange={ev => setParticipants(
-                  participants.map((_name, _index) =>
-                    index === _index ? ev.target.value : _name
-                  )
-                )}
-              />
-              <button
-                className="remove-participant"
-                // onClick={() => removeParticipant(index)}
-                onClick={() =>
-                  setParticipants(participants.filter((_, _index) =>
-                    index !== _index))}
+      <AnimatePresence>
+        {participants.length === 0 ? <p>No Participants</p> :
+          <div className="participant-section">
+            {participants.map(({ name, id }, index) => (
+              <motion.div
+                key={id}
+                className="participant-container"
+                variants={itemVariants}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
               >
-                &#10005;
-              </button>
-            </div>
-          ))}
-        </div>
-      }
+                <input
+                  type='text'
+                  value={name}
+                  onChange={ev => setParticipants(
+                    participants.map(({ name: _name, id: _id }, _index) => {
+                      return { id: _id, name: index === _index ? ev.target.value : _name }
+                    })
+                  )}
+                />
+                <button
+                  className="remove-participant"
+                  // onClick={() => removeParticipant(index)}
+                  onClick={() =>
+                    setParticipants(participants.filter((_, _index) =>
+                      index !== _index))}
+                >
+                  &#10005;
+                </button>
+              </motion.div>
+            ))}
+          </div>
+        }
+      </AnimatePresence>
 
       <div className="submit-session-buttons-container">
         {buttons.map(([name, onClick], index) => (
-          <button 
+          <button
             key={index}
             className="submit-session-button"
             onClick={() => onClick(getSessionInfo())}
@@ -162,13 +179,13 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
           </button>
         ))}
       </div>
-    </div>
+    </div >
   );
 };
 
 SessionForm.defaultProps = {
   sessionInfo: EMPTY_SESSION,
-  buttons: [['Submit', (sessionInfo:SessionInfo) => {}]],
+  buttons: [['Submit', (sessionInfo: SessionInfo) => { }]],
 };
 
 export default SessionForm;
