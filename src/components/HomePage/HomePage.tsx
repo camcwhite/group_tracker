@@ -15,7 +15,7 @@ const HomePage = () => {
 
   const quit = (ev: React.MouseEvent) => {
     ev.preventDefault();
-    window.postMessage('quitApp');
+    window.postMessage({ type: 'quitApp' });
   };
 
   return (

@@ -1,3 +1,6 @@
+import { storeGet, storeSet } from "./store";
+import { v4 as uuid } from "uuid";
+
 /**
  * Get the current date as a string
  * 
@@ -14,7 +17,7 @@ export const getTodayStr = () => {
 }
 
 export type SessionInfo = {
-  sessionID: number,
+  sessionID: string,
   groupName: string,
   dateStr: string,
   duration: number,
@@ -22,13 +25,20 @@ export type SessionInfo = {
 };
 
 export const EMPTY_SESSION: SessionInfo = {
-  sessionID: 0,
+  sessionID: '',
   groupName: '',
   dateStr: getTodayStr(), 
   duration: 1,
   participants: [],
 };
 
-export const getSession = (sessionID: number): SessionInfo => {
-  return EMPTY_SESSION;
+export const saveSession = async (session: SessionInfo): Promise<void> => {
+  if (session.sessionID === '') {
+    session.sessionID = uuid();
+  }  
+  return storeSet(`sessions.${session.sessionID}`, session);
+};
+
+export const getSession = async (sessionID: string): Promise<SessionInfo> => {
+  return storeGet(`sessions.${sessionID}`)
 };
