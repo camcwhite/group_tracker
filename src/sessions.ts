@@ -99,3 +99,20 @@ export const deleteSession = (sessionID: string): void => {
 
   storeSet(STORE_KEYS.SESSIONS, sessions)
 };
+
+/**
+ * Get the sessions in between two dates
+ * 
+ * @param startDateStr the starting date as a string in YYYY-MM-DD format
+ * @param endDateStr the starting date as a string in YYYY-MM-DD format
+ * @returns a list of saved sessions with dates in between startDateStr and 
+ *          endDateStr inclusive 
+ */
+export const getSessionsBetween = (startDateStr: string, endDateStr: string): SessionInfo[]  => {
+  const startDate = Date.parse(startDateStr);
+  const endDate = Date.parse(endDateStr);
+  return getAllSessions().filter(({dateStr}) => {
+    const date = Date.parse(dateStr);
+    return startDate <= date && date <= endDate; 
+  });
+}

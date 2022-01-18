@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { getDateStr, getTodayStr, oneMonthAgo } from "../../sessions";
+import { generateReport } from "../../reports";
+import { getDateStr, getSessionsBetween, getTodayStr, oneMonthAgo } from "../../sessions";
 import './CreateReportPage.css';
 
 const CreateReportPage = () => {
@@ -8,7 +9,8 @@ const CreateReportPage = () => {
   const [endDate, setEndDate] = useState(getTodayStr());
 
   const createPDF = () => {
-
+    const report = generateReport(getSessionsBetween(startDate, endDate), startDate, endDate);
+    console.log(report);
   };
 
   const createTXT = () => {
@@ -18,7 +20,7 @@ const CreateReportPage = () => {
   return (
     <div className="page CreateReportPage">
       <h1>Create Report</h1>
-      <form onSubmit={createPDF}>
+      <form>
         <label>
           Start Date:
           <input
@@ -36,8 +38,8 @@ const CreateReportPage = () => {
           />
         </label>
         <div className="create-form-buttons">
-          <button type='submit' onClick={createPDF}>PDF</button>
-          <button type='submit' onClick={createTXT}>Text File</button>
+          <button onClick={createPDF}>PDF</button>
+          <button onClick={createTXT}>Text File</button>
         </div>
       </form>
     </div>
