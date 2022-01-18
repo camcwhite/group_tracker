@@ -35,7 +35,7 @@ app.whenReady().then(() => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': ["script-src 'self'"]
+        'Content-Security-Policy': ["unsafe-eval"]
       }
     })
   })

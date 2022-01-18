@@ -5,7 +5,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  width: 25%;
+  width: 30%;
   gap: 20px;
 }
 
@@ -20,7 +20,7 @@
 
 .CreateReportPage > form > label,
 .CreateReportPage > form > label > input {
-  font-size: 24px;
+  font-size: clamp(.5vw, 4rem, 2vw);
 }
 
 .create-form-buttons {
