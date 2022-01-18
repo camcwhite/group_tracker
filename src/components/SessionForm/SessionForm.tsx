@@ -1,22 +1,8 @@
 import React, { useEffect, useState } from "react";
 import SearchDropDown from "../SearchDropDown/SearchDropDown";
-import { EMPTY_SESSION, SessionInfo, getSession } from "../../sessions";
+import { EMPTY_SESSION, SessionInfo, getSession, getAllGroupNames, getAllParticipantNames } from "../../sessions";
 import './SessionForm.css';
 import { AnimatePresence, motion } from "framer-motion";
-
-const groupNameSuggestions = [
-  'A',
-  'ABC',
-  'BC',
-  'BAC',
-];
-
-const participantSuggestions = [
-  'A',
-  'ABaaC',
-  'BC',
-  'BA123C',
-];
 
 /**
  * sessionInfo: the session info to populate the form with
@@ -88,7 +74,7 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
           Group Name:
           <SearchDropDown
             className="search-drop-down"
-            options={groupNameSuggestions}
+            options={getAllGroupNames()}
             value={groupName}
             onChange={setGroupName}
           />
@@ -119,7 +105,7 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
           <SearchDropDown
             className="search-drop-down"
             value={currentParticipant}
-            options={participantSuggestions}
+            options={getAllParticipantNames()}
             onChange={newValue => {
               setCurrentParticipant(newValue);
             }}

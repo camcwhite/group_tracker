@@ -1,14 +1,62 @@
-import Store from 'electron-store';
+import Store, { Schema } from 'electron-store';
+import { SessionInfo } from './sessions';
 
-const store = new Store({
+export type StoreSchemaType = {
+  sessions: SessionInfo[],
+  groupNames: string[],
+  participantNames: string[],
+}
+
+const storeSchema: Schema<StoreSchemaType> = {
+  sessions: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        sessionID: { type: 'string' },
+        groupName: { type: 'string' },
+        dateStr: { type: 'string' },
+        duration: { type: 'number' },
+        participants: { 
+          type: 'array', 
+          items: { type: 'string' },
+        },
+      }
+    }
+  },
+  groupNames: {
+    type: 'array',
+    items: {
+      type: 'string',
+    }
+  },
+  participantNames: {
+    type: 'array',
+    items: {
+      type: 'string',
+    }
+  }
+}
+
+export const STORE_KEYS: {
+  SESSIONS: keyof StoreSchemaType,
+  GROUP_NAMES: keyof StoreSchemaType,
+  PARTICIPANT_NAMES: keyof StoreSchemaType,
+} = {
+  SESSIONS: 'sessions',
+  GROUP_NAMES: 'groupNames',
+  PARTICIPANT_NAMES: 'participantNames',
+}
+
+const store = new Store<StoreSchemaType>({
   defaults: {
-    sessions: {},
-    groupNames: [],
-    participantNames: [],
+    sessions: new Array<SessionInfo>(), 
+    groupNames: new Array<string>(),
+    participantNames: new Array<string>(),
   }
 });
 
-export const storeGet = (key: string): unknown => {
+export const storeGet = (key: keyof StoreSchemaType): SessionInfo[] | string[] => {
   return store.get(key);
 };
 

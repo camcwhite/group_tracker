@@ -63,3 +63,23 @@
 .session-list-item > p:first-child {
   text-align: left;
 }
+
+.modal-button-row {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+
+  width: 100%;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+.modal-button-row > button {
+  width: 20%;
+}
+
+.modal-button-row > button:hover,
+.modal-button-row > button:focus {
+  padding: 0 20px;
+}

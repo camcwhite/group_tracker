@@ -1,10 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getAllGroupNames, getAllSessions, SessionInfo } from "../../sessions";
+import { deleteSession, getAllGroupNames, getAllSessions, SessionInfo } from "../../sessions";
+import ModalComponent from "../ModalComponent/ModalComponent";
 import SearchDropDown from "../SearchDropDown/SearchDropDown";
 import SessionForm from "../SessionForm/SessionForm";
 import './SessionSearchPage.css';
+
+enum ModalState {
+  NOT_SHOWING, CONFIRM_DELETE, CONFIRM_SAVE
+}
 
 const SessionSearchPage = () => {
   const [sessions, setSessions] = useState(getAllSessions());
@@ -35,12 +40,27 @@ const SessionSearchPage = () => {
     setEndDate('');
   };
 
+  const [confirmModalState, setConfirmModalState] = useState(ModalState.NOT_SHOWING);
+
   const handleSave = (sessionInfo: SessionInfo): boolean => {
     return true;
   };
 
   const handleDelete = (sessionInfo: SessionInfo): boolean => {
-    return true;
+    setConfirmModalState(ModalState.CONFIRM_DELETE);
+    return false;
+  };
+
+  const doSave = () => {
+
+  };
+
+  const doDelete = () => {
+    if (editingSession !== undefined) {
+      deleteSession(editingSession.sessionID)
+      setSessions(sessions.filter(({sessionID}) => sessionID !== editingSession.sessionID))
+      setEditingSession(undefined);
+    }
   };
 
   const handleBack = (): boolean => {
@@ -50,6 +70,26 @@ const SessionSearchPage = () => {
 
   return (
     <AnimatePresence exitBeforeEnter initial={false}>
+      <ModalComponent
+        handleClose={() => setConfirmModalState(ModalState.NOT_SHOWING)}
+        showing={confirmModalState !== ModalState.NOT_SHOWING}
+      >
+        <div className="page">
+          <h3>Are you Sure?</h3>
+          <p>{confirmModalState === ModalState.CONFIRM_DELETE ? "Delete" : confirmModalState === ModalState.CONFIRM_SAVE ? "Overwrite" : "Confirm"} this session?</p>
+          <div className="modal-button-row">
+            <button onClick={() => {
+              const doFunc = confirmModalState === ModalState.CONFIRM_DELETE ? doDelete :
+                confirmModalState === ModalState.CONFIRM_SAVE ? doSave : () => { };
+              setConfirmModalState(ModalState.NOT_SHOWING);
+              doFunc();
+            }}>
+              Yes
+            </button>
+            <button onClick={() => setConfirmModalState(ModalState.NOT_SHOWING)}>No</button>
+          </div>
+        </div>
+      </ModalComponent>
       {editingSession === undefined ? (
         <motion.div
           key='search'

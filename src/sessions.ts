@@ -1,4 +1,4 @@
-import { storeGet, storeSet } from "./store";
+import { storeGet, storeSet, STORE_KEYS } from "./store";
 import { v4 as uuid } from "uuid";
 
 /**
@@ -27,31 +27,54 @@ export type SessionInfo = {
 export const EMPTY_SESSION: SessionInfo = {
   sessionID: '',
   groupName: '',
-  dateStr: getTodayStr(), 
+  dateStr: getTodayStr(),
   duration: 1,
   participants: [],
+};
+
+export const getSession = (sessionID: string): SessionInfo => {
+  return getAllSessions().find(sessionInfo => sessionInfo.sessionID === sessionID) ?? EMPTY_SESSION;
+};
+
+export const getAllSessions = (): SessionInfo[] => {
+  return storeGet(STORE_KEYS.SESSIONS) as SessionInfo[];
+};
+
+export const getAllGroupNames = (): string[] => {
+  return storeGet(STORE_KEYS.GROUP_NAMES) as string[];
+};
+
+export const getAllParticipantNames = (): string[] => {
+  return storeGet(STORE_KEYS.PARTICIPANT_NAMES) as string[];
 };
 
 export const saveSession = (session: SessionInfo): void => {
   if (session.sessionID === '') {
     session.sessionID = uuid();
-  }  
-  return storeSet(`sessions.${session.sessionID}`, session);
+  }
+  const sessions = getAllSessions();
+
+  const groupNames = getAllGroupNames();
+  if (!groupNames.includes(session.groupName)) {
+    storeSet(STORE_KEYS.GROUP_NAMES, groupNames.concat(session.groupName))
+  }
+
+  const participantNames = getAllParticipantNames();
+  session.participants.forEach(participant => {
+    if (!participantNames.includes(participant)) {
+      storeSet(STORE_KEYS.PARTICIPANT_NAMES, participantNames.concat(participant));
+    }
+  })
+  console.log(storeGet(STORE_KEYS.PARTICIPANT_NAMES));
+
+  return storeSet(STORE_KEYS.SESSIONS, sessions.concat(session));
 };
 
-export const getSession = (sessionID: string): SessionInfo => {
-  return storeGet(`sessions.${sessionID}`) as SessionInfo;
+export const deleteSession = (sessionID: string): void => {
+  const sessions = getAllSessions().filter(sessionInfo => sessionInfo.sessionID !== sessionID);
+
+  storeSet(STORE_KEYS.GROUP_NAMES, sessions.map(({ groupName }) => groupName));
+  storeSet(STORE_KEYS.PARTICIPANT_NAMES, sessions.flatMap(({participants}) => participants));
+
+  storeSet(STORE_KEYS.SESSIONS, sessions)
 };
-
-export const getAllSessions = (): SessionInfo[] => {
-  const sessions = storeGet('sessions') as any;
-  return Object.entries(sessions).map(([sessionID, sessionInfo]) => sessionInfo as SessionInfo);
-};
-
-export const getAllGroupNames = (): string[] => {
-  return storeGet('groupNames') as string[];
-}
-
-export const getAllParticipantNames = (): string[] => {
-  return storeGet('particpantNames') as string[];
-}
