@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { deleteSession, getAllGroupNames, getAllSessions, saveSession, SessionInfo } from "../../sessions";
 import ModalComponent from "../ModalComponent/ModalComponent";
@@ -8,8 +8,14 @@ import SessionForm from "../SessionForm/SessionForm";
 import './SessionSearchPage.css';
 
 enum ModalState {
-  NOT_SHOWING, CONFIRM_DELETE, CONFIRM_SAVE
+  NOT_SHOWING, CONFIRM_DELETE, CONFIRM_SAVE, CONFIRM_BACK
 }
+
+const CONFIRM_MODAL_PROMPTS = new Map([
+  [ModalState.CONFIRM_DELETE, 'Delete this session?'],
+  [ModalState.CONFIRM_SAVE, 'Overwrite this session?'],
+  [ModalState.CONFIRM_BACK, 'Disregard current changes?'],
+]);
 
 enum SortState {
   NEUTRAL, INCREASING, DECREASING
@@ -32,11 +38,11 @@ const getNextSortState = (sortState: SortState): SortState => {
 //   [SortState.NEUTRAL, ]
 // ])
 
-const SORT_WORDS = new Map([
-  [SortState.NEUTRAL, '-'],
-  [SortState.INCREASING, 'U'],
-  [SortState.DECREASING, 'D'],
-])
+const SORT_CHARS = new Map<SortState, string>([
+  [SortState.NEUTRAL,'-'],
+  [SortState.INCREASING, '\u25b2'],
+  [SortState.DECREASING, '\u25bc'],
+]);
 
 const SessionSearchPage = () => {
   const [sessions, setSessions] = useState(getAllSessions());
@@ -131,10 +137,61 @@ const SessionSearchPage = () => {
     }
   };
 
-  const handleBack = (): boolean => {
-    setEditingSession(undefined);
-    return true;
+  const handleBack = (sessionInfo: SessionInfo): boolean => {
+    let diff = false;
+    if (editingSession) {
+      diff = sessionInfo.groupName !== editingSession.groupName ||
+              sessionInfo.dateStr !== editingSession.dateStr ||
+              sessionInfo.duration !== editingSession.duration ||
+              sessionInfo.participants.length !== editingSession.participants.length ||
+              sessionInfo.participants.reduce(
+                (soFar: boolean, participant, index) => 
+                  soFar || (participant !== editingSession.participants[index]), false);
+    }
+
+    if (diff) {
+      setConfirmModalState(ModalState.CONFIRM_BACK); 
+    }
+    else {
+      doBack();
+    }
+
+    return false;
   }
+
+  const doBack = () => {
+    setEditingSession(undefined);
+  };
+
+  const doFuncs = new Map([
+    [ModalState.CONFIRM_DELETE, doDelete],
+    [ModalState.CONFIRM_SAVE, doSave],
+    [ModalState.CONFIRM_BACK, doBack],
+  ]);
+
+  const sortButton = (sortState: SortState, setSortState: (sortState: SortState) => void) => (
+    <button 
+      onClick={() => setSortState(getNextSortState(sortState))}
+    >
+      <div className="session-list-header-sort-container">
+        <p 
+          className={
+            sortState !== SortState.DECREASING ? 'sort-button-showing' : 'sort-button-hiding'
+          }
+        >
+          {"\u25b2"}
+        </p>
+        <p 
+          className={
+            sortState !== SortState.INCREASING ? 'sort-button-showing' : 'sort-button-hiding'
+          }
+        >
+          {"\u25bc"}
+        </p>
+      </div>
+    </button>
+  );
+
 
   return (
     <AnimatePresence exitBeforeEnter initial={false}>
@@ -144,11 +201,10 @@ const SessionSearchPage = () => {
       >
         <div className="page">
           <h3>Are you Sure?</h3>
-          <p>{confirmModalState === ModalState.CONFIRM_DELETE ? "Delete" : confirmModalState === ModalState.CONFIRM_SAVE ? "Overwrite" : "Confirm"} this session?</p>
+          <p>{CONFIRM_MODAL_PROMPTS.get(confirmModalState) ?? ''}</p>
           <div className="modal-button-row">
             <button onClick={() => {
-              const doFunc = confirmModalState === ModalState.CONFIRM_DELETE ? doDelete :
-                confirmModalState === ModalState.CONFIRM_SAVE ? doSave : () => { };
+              const doFunc = doFuncs.get(confirmModalState) ?? (() => { });
               setConfirmModalState(ModalState.NOT_SHOWING);
               doFunc();
             }}>
@@ -202,30 +258,15 @@ const SessionSearchPage = () => {
             <div className="session-list-header-section">
               <div className="session-list-header">
                 <p>Group Name:</p>
-                <button 
-                  className="session-list-header-button"
-                  onClick={() => setGroupSortState(getNextSortState(groupSortState))}
-                >
-                  {SORT_WORDS.get(groupSortState) ?? '-'}
-                </button>
+                {sortButton(groupSortState, setGroupSortState)}
               </div>
               <div className="session-list-header">
                 <p>Date:</p>
-                <button 
-                  className="session-list-header-button"
-                  onClick={() => setDateSortState(getNextSortState(dateSortState))}
-                >
-                  {SORT_WORDS.get(dateSortState) ?? '-'}
-                </button>
+                {sortButton(dateSortState, setDateSortState)}
               </div>
               <div className="session-list-header">
                 <p>Duration (hours):</p>
-                <button 
-                  className="session-list-header-button"
-                  onClick={() => setDurationSortState(getNextSortState(durationSortState))}
-                >
-                  {SORT_WORDS.get(durationSortState) ?? '-'}
-                </button>
+                {sortButton(durationSortState, setDateSortState)}
               </div>
             </div>
             {sessions.filter(filterSessionInfo).sort(sortSessionInfo).map(sessionInfo => (
