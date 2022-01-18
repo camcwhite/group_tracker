@@ -11,12 +11,43 @@ enum ModalState {
   NOT_SHOWING, CONFIRM_DELETE, CONFIRM_SAVE
 }
 
+enum SortState {
+  NEUTRAL, INCREASING, DECREASING
+}
+
+const getNextSortState = (sortState: SortState): SortState => {
+  switch (sortState) {
+    case SortState.NEUTRAL:
+      return SortState.INCREASING; 
+    case SortState.INCREASING:
+      return SortState.DECREASING;
+    case SortState.DECREASING:
+      return SortState.NEUTRAL;
+    default:
+      return SortState.NEUTRAL;
+  }
+};
+
+// const SORT_IMAGES = new Map([
+//   [SortState.NEUTRAL, ]
+// ])
+
+const SORT_WORDS = new Map([
+  [SortState.NEUTRAL, '-'],
+  [SortState.INCREASING, 'U'],
+  [SortState.DECREASING, 'D'],
+])
+
 const SessionSearchPage = () => {
   const [sessions, setSessions] = useState(getAllSessions());
   const [groupNameFilter, setGroupNameFilter] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [allGroupNames, setAllGroupNames] = useState<string[]>([]);
+
+  const [groupSortState, setGroupSortState] = useState(SortState.NEUTRAL);
+  const [dateSortState, setDateSortState] = useState(SortState.NEUTRAL);
+  const [durationSortState, setDurationSortState] = useState(SortState.NEUTRAL);
 
   const [editingSession, setEditingSession] = useState<SessionInfo | undefined>(undefined);
 
@@ -32,6 +63,35 @@ const SessionSearchPage = () => {
     return sessionInfo.groupName.startsWith(groupNameFilter) &&
       (!compareDates ||
         (startDateMs <= sessionDateMs && endDateMs >= sessionDateMs))
+  };
+
+  const sortSessionInfo = (sessionA: SessionInfo, sessionB: SessionInfo): number => {
+    if (dateSortState !== SortState.NEUTRAL) {
+      const dateA = Date.parse(sessionA.dateStr);
+      const dateB = Date.parse(sessionB.dateStr);
+      const rev = dateSortState === SortState.DECREASING ? -1 : 1;
+      const comp = rev * (dateA - dateB);
+      if (comp !== 0) {
+        return comp;
+      }
+    }
+
+    if (groupSortState !== SortState.NEUTRAL) {
+      const rev = groupSortState === SortState.DECREASING ? -1 : 1;
+      if (sessionA.groupName > sessionB.groupName) {
+        return rev * 1;
+      }
+      if (sessionA.groupName < sessionB.groupName) {
+        return rev * -1;
+      }
+    }
+
+    if (durationSortState !== SortState.NEUTRAL) {
+      const rev = durationSortState === SortState.DECREASING ? -1 : 1;
+      return rev * (sessionA.duration - sessionB.duration)
+    }
+
+    return 0;
   };
 
   const resetFilters = () => {
@@ -131,12 +191,36 @@ const SessionSearchPage = () => {
             Reset Filters
           </button>
           <div className="session-list-container">
-            <div className="session-list-header">
-              <p>Group Name</p>
-              <p>Date</p>
-              <p>Duration (hours)</p>
+            <div className="session-list-header-section">
+              <div className="session-list-header">
+                <p>Group Name:</p>
+                <button 
+                  className="session-list-header-button"
+                  onClick={() => setGroupSortState(getNextSortState(groupSortState))}
+                >
+                  {SORT_WORDS.get(groupSortState) ?? '-'}
+                </button>
+              </div>
+              <div className="session-list-header">
+                <p>Date:</p>
+                <button 
+                  className="session-list-header-button"
+                  onClick={() => setDateSortState(getNextSortState(dateSortState))}
+                >
+                  {SORT_WORDS.get(dateSortState) ?? '-'}
+                </button>
+              </div>
+              <div className="session-list-header">
+                <p>Duration (hours):</p>
+                <button 
+                  className="session-list-header-button"
+                  onClick={() => setDurationSortState(getNextSortState(durationSortState))}
+                >
+                  {SORT_WORDS.get(durationSortState) ?? '-'}
+                </button>
+              </div>
             </div>
-            {sessions.filter(filterSessionInfo).map(sessionInfo => (
+            {sessions.filter(filterSessionInfo).sort(sortSessionInfo).map(sessionInfo => (
               <div
                 key={sessionInfo.sessionID}
                 className="button session-list-item"

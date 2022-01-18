@@ -55,17 +55,10 @@ export const saveSession = (session: SessionInfo): void => {
   const sessions = getAllSessions();
 
   const groupNames = getAllGroupNames();
-  if (!groupNames.includes(session.groupName)) {
-    storeSet(STORE_KEYS.GROUP_NAMES, groupNames.concat(session.groupName))
-  }
+  storeSet(STORE_KEYS.GROUP_NAMES, [...new Set(groupNames.concat(session.groupName))]);
 
   const participantNames = getAllParticipantNames();
-  session.participants.forEach(participant => {
-    if (!participantNames.includes(participant)) {
-      storeSet(STORE_KEYS.PARTICIPANT_NAMES, participantNames.concat(participant));
-    }
-  })
-  console.log(storeGet(STORE_KEYS.PARTICIPANT_NAMES));
+  storeSet(STORE_KEYS.PARTICIPANT_NAMES, [...new Set(participantNames.concat(session.participants))]);
 
   return storeSet(STORE_KEYS.SESSIONS, sessions.concat(session));
 };

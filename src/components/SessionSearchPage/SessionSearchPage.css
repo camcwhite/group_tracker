@@ -39,15 +39,23 @@
   height: 30px;
 }
 
-.session-list-header,
+.session-list-header-section,
 .session-list-item {
   display: grid;
   grid-template-columns: 50% 25% 25%;
   width: 100%;
 }
 
-.session-list-header {
+.session-list-header-section {
   text-align: center;
+}
+
+.session-list-header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 10px;
 }
 
 .session-list-item {
