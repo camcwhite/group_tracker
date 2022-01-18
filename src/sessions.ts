@@ -49,16 +49,29 @@ export const getAllParticipantNames = (): string[] => {
 };
 
 export const saveSession = (session: SessionInfo): void => {
+  let sessions = getAllSessions();
   if (session.sessionID === '') {
-    session.sessionID = uuid();
+    // generate a new unique session ID
+    let goodID = false;
+    while (!goodID) {
+      const newSessionID = uuid();
+      if (sessions.reduce((soFar, {sessionID}) => soFar && sessionID !== newSessionID, true)) {
+        session.sessionID = newSessionID;
+        goodID = true;
+      }
+    }
   }
-  const sessions = getAllSessions();
 
   const groupNames = getAllGroupNames();
   storeSet(STORE_KEYS.GROUP_NAMES, [...new Set(groupNames.concat(session.groupName))]);
 
   const participantNames = getAllParticipantNames();
   storeSet(STORE_KEYS.PARTICIPANT_NAMES, [...new Set(participantNames.concat(session.participants))]);
+
+  if (sessions.find(({sessionID}) => sessionID === session.sessionID) !== undefined) {
+    // get rid of existing session
+    sessions = sessions.filter(({sessionID}) => sessionID !== session.sessionID);
+  }
 
   return storeSet(STORE_KEYS.SESSIONS, sessions.concat(session));
 };

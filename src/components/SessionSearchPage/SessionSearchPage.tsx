@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { deleteSession, getAllGroupNames, getAllSessions, SessionInfo } from "../../sessions";
+import { deleteSession, getAllGroupNames, getAllSessions, saveSession, SessionInfo } from "../../sessions";
 import ModalComponent from "../ModalComponent/ModalComponent";
 import SearchDropDown from "../SearchDropDown/SearchDropDown";
 import SessionForm from "../SessionForm/SessionForm";
@@ -46,7 +46,7 @@ const SessionSearchPage = () => {
   const [allGroupNames, setAllGroupNames] = useState<string[]>([]);
 
   const [groupSortState, setGroupSortState] = useState(SortState.NEUTRAL);
-  const [dateSortState, setDateSortState] = useState(SortState.NEUTRAL);
+  const [dateSortState, setDateSortState] = useState(SortState.DECREASING);
   const [durationSortState, setDurationSortState] = useState(SortState.NEUTRAL);
 
   const [editingSession, setEditingSession] = useState<SessionInfo | undefined>(undefined);
@@ -101,9 +101,12 @@ const SessionSearchPage = () => {
   };
 
   const [confirmModalState, setConfirmModalState] = useState(ModalState.NOT_SHOWING);
+  const saveSessionRef = useRef<SessionInfo>();
 
   const handleSave = (sessionInfo: SessionInfo): boolean => {
-    return true;
+    setConfirmModalState(ModalState.CONFIRM_SAVE);
+    saveSessionRef.current = sessionInfo;
+    return false;
   };
 
   const handleDelete = (sessionInfo: SessionInfo): boolean => {
@@ -112,7 +115,12 @@ const SessionSearchPage = () => {
   };
 
   const doSave = () => {
-
+    const currentSession = saveSessionRef.current;
+    if (currentSession !== undefined) {
+      saveSession(currentSession);
+      setSessions(sessions.filter(({sessionID}) => sessionID !== currentSession.sessionID).concat(currentSession));
+      setEditingSession(undefined);
+    }
   };
 
   const doDelete = () => {
