@@ -1,4 +1,7 @@
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron')
+const Store = require('electron-store')
+
+Store.initRenderer()
 
 require('@electron/remote/main').initialize()
 
@@ -8,8 +11,8 @@ function createWindow() {
     height: 600,
     webPreferences: {
       enableRemoteModule: true,
-      // nodeIntegration: true,
-      // contextIsolation: false,
+      nodeIntegration: true,
+      contextIsolation: false,
       preload: `${__dirname}/preload.js`,
     },
   })

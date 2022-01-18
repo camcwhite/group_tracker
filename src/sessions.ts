@@ -32,13 +32,13 @@ export const EMPTY_SESSION: SessionInfo = {
   participants: [],
 };
 
-export const saveSession = async (session: SessionInfo): Promise<void> => {
+export const saveSession = (session: SessionInfo): void => {
   if (session.sessionID === '') {
     session.sessionID = uuid();
   }  
   return storeSet(`sessions.${session.sessionID}`, session);
 };
 
-export const getSession = async (sessionID: string): Promise<SessionInfo> => {
-  return storeGet(`sessions.${sessionID}`)
+export const getSession = (sessionID: string): SessionInfo => {
+  return storeGet(`sessions.${sessionID}`) as SessionInfo;
 };

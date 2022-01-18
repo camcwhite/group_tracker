@@ -29,6 +29,7 @@ module.exports = {
       },
     ]
   },
+  target: 'electron-renderer',
   devtool: prod ? undefined : 'source-map',
   plugins: [
     new HtmlWebpackPlugin({
