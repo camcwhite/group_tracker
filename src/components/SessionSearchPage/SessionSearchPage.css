@@ -1,0 +1,65 @@
+.SessionSearchPage {
+}
+
+.session-list-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 70%;
+  gap: 10px;
+}
+
+.search-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 60%;
+  margin-bottom: 10px;
+}
+
+.search-container > p {
+  margin: 0;
+} 
+
+.search-container > p, 
+.search-container > input, 
+.filter-search-drop-down {
+  font-size: 22px;
+}
+
+.search-container > input, 
+.filter-search-drop-down {
+  height: 40px;
+}
+
+.reset-filters-button {
+  height: 30px;
+}
+
+.session-list-header,
+.session-list-item {
+  display: grid;
+  grid-template-columns: 50% 25% 25%;
+  width: 100%;
+}
+
+.session-list-header {
+  text-align: center;
+}
+
+.session-list-item {
+  border-radius: 10px;
+  padding: 0 10px 0 20px;
+}
+
+.session-list-item:hover {
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.session-list-item > p:first-child {
+  text-align: left;
+}

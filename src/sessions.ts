@@ -42,3 +42,16 @@ export const saveSession = (session: SessionInfo): void => {
 export const getSession = (sessionID: string): SessionInfo => {
   return storeGet(`sessions.${sessionID}`) as SessionInfo;
 };
+
+export const getAllSessions = (): SessionInfo[] => {
+  const sessions = storeGet('sessions') as any;
+  return Object.entries(sessions).map(([sessionID, sessionInfo]) => sessionInfo as SessionInfo);
+};
+
+export const getAllGroupNames = (): string[] => {
+  return storeGet('groupNames') as string[];
+}
+
+export const getAllParticipantNames = (): string[] => {
+  return storeGet('particpantNames') as string[];
+}

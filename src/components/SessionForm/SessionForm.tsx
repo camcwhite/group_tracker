@@ -18,9 +18,15 @@ const participantSuggestions = [
   'BA123C',
 ];
 
+/**
+ * sessionInfo: the session info to populate the form with
+ * buttons: an array of tuples, each indicating the text to display
+ *          on a button and a function that is called when the button 
+ *          is pressed and returns true if the form should be cleared
+ */
 type SessionFormProps = {
   sessionInfo: SessionInfo,
-  buttons: Array<[string, (sessionInfo: SessionInfo) => void]>,
+  buttons: Array<[string, (sessionInfo: SessionInfo) => boolean]>,
 };
 
 const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
@@ -31,20 +37,20 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
 
   const [duration, setDuration] = useState(sessionInfo.duration);
 
-  const [participants, setParticipants] = useState<{ name: string, id: number }[]>(
-    sessionInfo.participants.map((name, index) => {
+  const getParticipantObjects = () => {
+    return sessionInfo.participants.map((name, index) => {
       return { name, id: index + 1 }
     })
-  );
+  }
+
+  const [participants, setParticipants] = useState<{ name: string, id: number }[]>(getParticipantObjects());
 
   const [idCounter, setIDCounter] = useState(sessionInfo.participants.length + 1);
 
   const [currentParticipant, setCurrentParticipant] = useState('');
 
   const addParticipant = (name: string) => {
-    console.log('call adding', name);
     if (name.length !== 0) {
-      console.log('adding', name);
       setCurrentParticipant('');
       setParticipants([{ name, id: idCounter }, ...participants]);
       setIDCounter(idCounter + 1);
@@ -61,21 +67,19 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
     };
   };
 
+  const clearForm = () => {
+    setGroupName(sessionInfo.groupName);
+    setDateStr(sessionInfo.dateStr);
+    setDuration(sessionInfo.duration);
+    setParticipants(getParticipantObjects());
+  }
+
   const handleKeyPress = (ev: React.KeyboardEvent) => {
     if (ev.key === 'Enter') {
       ev.preventDefault();
       addParticipant(currentParticipant);
     }
   }
-
-  const itemVariants = {
-    hidden: {
-      opacity: 0,
-      scale: 0.8,
-      transition: { type: "spring", bounce: 0.4 }
-    },
-    show: { opacity: 1, scale: 1, transition: { type: "spring", bounce: 0.4 } }
-  };
 
   return (
     <div className="page SessionForm" onKeyPress={handleKeyPress}>
@@ -94,10 +98,7 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
           <input
             type='date'
             value={dateStr}
-            onChange={ev => {
-              console.log(ev.target.value);
-              setDateStr(ev.target.value);
-            }}
+            onChange={ev => setDateStr(ev.target.value)}
           />
         </label>
         <label>
@@ -173,7 +174,11 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
           <button
             key={index}
             className="submit-session-button"
-            onClick={() => onClick(getSessionInfo())}
+            onClick={() => {
+              if (onClick(getSessionInfo())) {
+                clearForm();
+              }
+            }}
           >
             {name}
           </button>
@@ -185,7 +190,7 @@ const SessionForm = ({ sessionInfo, buttons }: SessionFormProps) => {
 
 SessionForm.defaultProps = {
   sessionInfo: EMPTY_SESSION,
-  buttons: [['Submit', (sessionInfo: SessionInfo) => { }]],
+  buttons: [['Submit', (sessionInfo: SessionInfo) => true]],
 };
 
 export default SessionForm;

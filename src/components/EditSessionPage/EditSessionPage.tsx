@@ -1,17 +1,18 @@
-import React, { useState } from "react";
-import { SessionInfo } from "../../sessions";
+import React, { useEffect, useState } from "react";
+import { SessionInfo, getAllSessions } from "../../sessions";
 import SessionForm from "../SessionForm/SessionForm";
 import './EditSessionPage.css';
 
 const EditSessionPage = () => {
   const [currentSessionID, setCurrentSessionID] = useState(0); 
+  const [sessions, setSessions] = useState<SessionInfo[]>(getAllSessions());
 
-  const handleSave = (sessionInfo: SessionInfo) => {
-    
+  const handleSave = (sessionInfo: SessionInfo): boolean => {
+    return true;
   };
 
-  const handleDelete = (sessionInfo: SessionInfo) => {
-
+  const handleDelete = (sessionInfo: SessionInfo): boolean => {
+    return true;
   };
 
   return (

@@ -15,6 +15,7 @@ type SearchDropDownProps = {
   value: string,
   onChange: (newValue: string) => void,
   onSubmit?: () => void,
+  searchBarHeight?: string,
   className?: string,
   placeholder?: string,
   width?: string,
