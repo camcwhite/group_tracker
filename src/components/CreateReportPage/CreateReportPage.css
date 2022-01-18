@@ -1,0 +1,40 @@
+.CreateReportPage {}
+
+.CreateReportPage > form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 70%;
+  gap: 20px;
+}
+
+.CreateReportPage > form > label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.CreateReportPage > form > label,
+.CreateReportPage > form > label > input {
+  font-size: 24px;
+}
+
+.create-form-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 20px;
+}
+
+.create-form-buttons > button {
+  width: 10%;
+}
+
+.create-form-buttons > button:hover {
+  padding: 0 30px;
+}

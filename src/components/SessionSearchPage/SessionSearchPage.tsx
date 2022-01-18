@@ -266,7 +266,7 @@ const SessionSearchPage = () => {
               </div>
               <div className="session-list-header">
                 <p>Duration (hours):</p>
-                {sortButton(durationSortState, setDateSortState)}
+                {sortButton(durationSortState, setDurationSortState)}
               </div>
             </div>
             {sessions.filter(filterSessionInfo).sort(sortSessionInfo).map(sessionInfo => (

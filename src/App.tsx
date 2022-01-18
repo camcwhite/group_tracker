@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import AddSessionPage from "./components/AddSessionPage/AddSessionPage";
 import EditSessionPage from "./components/EditSessionPage/EditSessionPage";
 import SessionSearchPage from "./components/SessionSearchPage/SessionSearchPage";
+import CreateReportPage from "./components/CreateReportPage/CreateReportPage";
 
 const TransitionPage = (PageElement: () => JSX.Element, props?: JSX.IntrinsicAttributes): JSX.Element => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
           <Route path='/about' element={TransitionPage(AboutPage)} />
           <Route path='/add-session' element={TransitionPage(AddSessionPage)} />
           <Route path='/edit-sessions' element={TransitionPage(SessionSearchPage)} />
+          <Route path='/create-report' element={TransitionPage(CreateReportPage)} />
         </Routes>
       </AnimatePresence>
     </div>

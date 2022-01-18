@@ -7,14 +7,29 @@ import { v4 as uuid } from "uuid";
  * @returns the current date in YYYY-MM-DD
  */
 export const getTodayStr = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const raw_month = today.getMonth() + 1;
+  return getDateStr(new Date());
+}
+
+/**
+ * Get a date as a string
+ * 
+ * @returns a date in YYYY-MM-DD
+ */
+export const getDateStr = (date: Date): string => {
+  const year = date.getFullYear();
+  const raw_month = date.getMonth() + 1;
   const month = raw_month >= 10 ? `${raw_month}` : `0${raw_month}`;
-  const raw_day = today.getDate();
+  const raw_day = date.getDate();
   const day = raw_day >= 10 ? `${raw_day}` : `0${raw_day}`;
   return `${year}-${month}-${day}`;
-}
+};
+
+export const oneMonthAgo = (): Date => {
+  const today = new Date();
+  const newDate = new Date(today.getTime());
+  newDate.setMonth(today.getMonth() - 1);
+  return newDate;
+};
 
 export type SessionInfo = {
   sessionID: string,
