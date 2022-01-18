@@ -1,0 +1,49 @@
+{
+  "LAST_SAVED": "2022-01-18 11:00 AM",
+  "SESSIONS": [
+    {
+      "GROUP_NAME": "Group 2",
+      "DATE": "2022-01-18",
+      "DURATION_HOURS": 2.0,
+      "ATTENDEES": [
+        "Caleel",
+        "Renee"
+      ]
+    },
+    {
+      "GROUP_NAME": "Group 1",
+      "DATE": "2022-01-15",
+      "DURATION_HOURS": 1.0,
+      "ATTENDEES": [
+        "Cam",
+        "Robert",
+        "Jon"
+      ]
+    },
+    {
+      "GROUP_NAME": "Group 1",
+      "DATE": "2022-01-12",
+      "DURATION_HOURS": 1.0,
+      "ATTENDEES": [
+        "Cam",
+        "Caleel",
+        "Baxter"
+      ]
+    }
+  ],
+  "PARTICIPANTS": [
+    "Me",
+    "Renee",
+    "Baxter",
+    "Cam",
+    "Robert",
+    "I",
+    "Caleel",
+    "Jon",
+    "Myself"
+  ],
+  "GROUPS": [
+    "Group 2",
+    "Group 1"
+  ]
+}
