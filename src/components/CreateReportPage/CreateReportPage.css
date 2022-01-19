@@ -24,16 +24,16 @@
 }
 
 .create-form-buttons {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: auto;
+  justify-items: center;
   width: 100%;
   gap: 20px;
 }
 
 .create-form-buttons > button {
-  width: 50%;
+  width: 70%;
 }
 
 .create-form-buttons > button:hover {

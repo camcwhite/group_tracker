@@ -76,12 +76,13 @@ const getFormattedTime = (date) => {
 }
 
 ipcMain.on('savePDF', async (_, { title, mainText, groups, attendees }) => {
-  const doc = new PDFDocument()
   const { canceled, filePath } = await dialog.showSaveDialog(browserWindow, {
     title: 'Save PDF Report',
     defaultPath: path.join(app.getAppPath(), 'report.pdf'),
+    filters: [{ name: 'PDF (.pdf)', extensions: ['pdf'] }]
   })
   if (!canceled) {
+    const doc = new PDFDocument()
     const stream = fs.createWriteStream(filePath)
     doc.pipe(stream)
 
@@ -112,5 +113,24 @@ ipcMain.on('savePDF', async (_, { title, mainText, groups, attendees }) => {
     doc.list(attendees, listOptions)
 
     doc.end()
+  }
+})
+
+ipcMain.on('saveTXT', async (_, { title, mainText, groups, attendees }) => {
+  const { canceled, filePath } = await dialog.showSaveDialog(browserWindow, {
+    title: 'Save TXT Report',
+    defaultPath: path.join(app.getAppPath(), 'report.txt'),
+    filters: [{ name: 'Text File (.txt, .text)', extensions: ['txt', 'text'] }]
+  })
+  if (!canceled) {
+    let content = title + '\n' + mainText.join('\n') + '\n'
+    content += '\nGroups:\n' + groups.map(([name, lines]) => `\t${name}\n${lines.map(line => `\t\t${line}`).join('\n')}`).join('\n') + '\n'
+    content += '\nAttendees:\n' + attendees.map(line => `\t${line}`).join('\n')
+
+    fs.writeFile(filePath, content, err => {
+      if (err) {
+        console.error(err)
+      }
+    })
   }
 })
