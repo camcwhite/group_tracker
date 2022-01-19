@@ -46,13 +46,38 @@ const AboutPage = () => {
               Enter start and end date for the report. The report will be generated from all saved sessions between the start and end date.
             </li>
             <li>
-              Click 'PDF' to save report to a PDF (.pdf) file (after choosing a save location and file name)
+              Click 'PDF' to save report to a PDF (.pdf) file (after choosing a save location and file name).
             </li>
             <li>
-              Click 'Text' to save report to a text (.txt) file (after choosing a save location and file name)
+              Click 'Text' to save report to a text (.txt) file (after choosing a save location and file name).
             </li>
             <li>
-              Click either of the CSV options to generate a CSV file that can be imported to Excel or Google Sheets
+              Click either of the CSV options to generate a CSV file that can be imported to Excel or Google Sheets.
+            </li>
+          </ul>
+        </li>
+        <li>
+          To export saved data:
+          <ul>
+            <li>
+              Click 'Manage Data' from the main menu.
+            </li>
+            <li>
+              Click 'Export' and select a save destination.
+            </li>
+          </ul>
+        </li>
+        <li>
+          To upload data:
+          <ul>
+            <li>
+              Click 'Manage Data' from the main menu.
+            </li>
+            <li>
+              Click 'Upload Data' and select a file to upload data that was exported from this version of the app.
+            </li>
+            <li>
+              Click 'Upload Legacy Data' and select a file to upload data that was exported from the older (Python) version of the app.
             </li>
           </ul>
         </li>

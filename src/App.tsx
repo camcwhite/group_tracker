@@ -6,7 +6,6 @@ import AboutPage from "./components/AboutPage/AboutPage";
 import AppHeader from "./components/AppHeader/AppHeader";
 import { AnimatePresence, motion } from "framer-motion";
 import AddSessionPage from "./components/AddSessionPage/AddSessionPage";
-import EditSessionPage from "./components/EditSessionPage/EditSessionPage";
 import SessionSearchPage from "./components/SessionSearchPage/SessionSearchPage";
 import CreateReportPage from "./components/CreateReportPage/CreateReportPage";
 import ManageDataPage from "./components/ManageDataPage/ManageDataPage";
