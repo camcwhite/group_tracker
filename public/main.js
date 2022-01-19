@@ -167,7 +167,7 @@ ipcMain.on('upload-legacy-data', async (event) => {
     buttonLabel: 'Upload',
     properties: ['openFile'],
   })
-  if (!canceled || filePaths.length < 1) {
+  if (!canceled && filePaths.length >= 1) {
     fs.readFile(filePaths[0], (err, data) => {
       if (err) {
         event.reply('upload-done', { status: 'error', error: err })
@@ -188,7 +188,7 @@ ipcMain.on('upload-data', async (event) => {
     buttonLabel: 'Upload',
     properties: ['openFile'],
   })
-  if (!canceled || filePaths.length < 1) {
+  if (!canceled && filePaths.length >= 1) {
     fs.readFile(filePaths[0], (err, data) => {
       if (err) {
         event.reply('upload-done', { status: 'error', error: err })

@@ -30,8 +30,11 @@ const ManageDataPage = () => {
       }
       if (sessions !== undefined) {
         sessions.forEach(saveSession);
+        navigate('/');
       }
-      navigate('/');
+      else {
+        console.error('Malformed Session Data', data.data);
+      }
     }
   };
 
