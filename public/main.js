@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, session, shell, dialog } = require('electron')
+const isDev = require('electron-is-dev')
 const Store = require('electron-store')
 
 const fs = require('fs')
@@ -27,7 +28,11 @@ function createWindow() {
     shell.openExternal(url)
     return { action: 'deny' }
   });
-  browserWindow.loadURL('http://localhost:3000')
+  browserWindow.loadURL(
+    isDev
+      ? 'http://localhost:3000'
+      : `file://${path.join(__dirname, '../build/index.html')}`
+  )
 }
 
 app.whenReady().then(() => {

@@ -7,10 +7,24 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --port 3000",
-    "build": "NODE_ENV=production webpack",
+    "build": "SET NODE_ENV=production && webpack",
     "electron-dev": "concurrently -k \"cross-env BROWSER=none npm run start\" \" npm run electron-start\"",
-    "electron-build": "",
+    "electron-build": "npm run build && electron-builder -c.extraMetadata.main=build/main.js",
     "electron-start": "wait-on tcp:3000 && electron ."
+  },
+  "build": {
+    "extends": null,
+    "appId": "com.camwhite.rca-data-tracker",
+    "files": [
+      "dist/**/*",
+      "build/**/*",
+      "src/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "buildResources": "src/assets"
+    }
   },
   "repository": {
     "type": "git",
@@ -28,7 +42,6 @@
     "@types/uuid": "^8.3.4",
     "concurrently": "^7.0.0",
     "cross-env": "^7.0.3",
-    "electron": "^16.0.6",
     "electron-store": "^8.0.1",
     "framer-motion": "^5.5.7",
     "path-browserify": "^1.0.1",
@@ -41,6 +54,8 @@
     "wait-on": "^6.0.0"
   },
   "devDependencies": {
+    "electron": "^16.0.6",
+    "@electron-forge/cli": "^6.0.0-beta.63",
     "@types/react": "^17.0.38",
     "@types/react-dom": "^17.0.11",
     "css-loader": "^6.5.1",
