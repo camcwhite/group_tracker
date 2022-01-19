@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { generateReport } from "../../reports";
+import { generateReport, getReportText } from "../../reports";
 import { getDateStr, getSessionsBetween, getTodayStr, oneMonthAgo } from "../../sessions";
 import './CreateReportPage.css';
 
@@ -9,14 +9,10 @@ const CreateReportPage = () => {
   const [endDate, setEndDate] = useState(getTodayStr());
 
   const createPDF = () => {
-    const report = generateReport(getSessionsBetween(startDate, endDate), startDate, endDate);
-    // console.log(report);
-    // const PDFReport = generatePDF(report);
-    // ReactPDF.renderToFile(PDFReport, './report.pdf');
-    // ReactPDF.render(PDFReport, `${__dirname}/report.pdf`);
+    const reportText = getReportText(generateReport(getSessionsBetween(startDate, endDate), startDate, endDate)); 
     window.postMessage({
       type: 'savePDF',
-      data: report,
+      data: reportText, 
     })
   };
 

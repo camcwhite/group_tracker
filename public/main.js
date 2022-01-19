@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, session, shell, dialog } = require('electro
 const Store = require('electron-store')
 
 const fs = require('fs')
+const path = require('path')
 const PDFDocument = require('pdfkit')
 
 Store.initRenderer()
@@ -53,17 +54,63 @@ app.on('window-all-closed', function () {
 
 ipcMain.on('quitApp', () => app.quit())
 
-ipcMain.on('savePDF', async (_, args) => {
-  const report = args[0];
+const dateOptions = {
+  timeZone: 'US/Eastern',
+  day: 'numeric',
+  year: 'numeric',
+  month: 'long',
+}
+
+const timeOptions = {
+  timeZone: 'US/Eastern',
+  hour: 'numeric',
+  minute: '2-digit',
+}
+
+const getFormattedDate = (date) => {
+  return date.toLocaleDateString('en-US', dateOptions);
+}
+
+const getFormattedTime = (date) => {
+  return date.toLocaleTimeString('en-US', dateOptions);
+}
+
+ipcMain.on('savePDF', async (_, { title, mainText, groups, attendees }) => {
   const doc = new PDFDocument()
-  const {canceled, filePath} = await dialog.showSaveDialog(browserWindow, {
+  const { canceled, filePath } = await dialog.showSaveDialog(browserWindow, {
     title: 'Save PDF Report',
-    defaultPath: app.getAppPath(),
-  }) 
+    defaultPath: path.join(app.getAppPath(), 'report.pdf'),
+  })
   if (!canceled) {
-    const stream = fs.createWriteStream(filePath)  
+    const stream = fs.createWriteStream(filePath)
     doc.pipe(stream)
-    doc.text("Hello World", 100, 100)
+
+    doc.lineGap(4)
+    const listOptions = {
+      bulletRadius: 1.5,
+      textIndent: 6,
+    }
+
+    doc.fontSize(14)
+    doc.text(title, { align: 'center' })
+    doc.moveDown()
+
+    doc.fontSize(10)
+    mainText.forEach(line => doc.text(line))
+    doc.moveDown()
+    doc.fontSize(14)
+    doc.text('Groups', { align: 'center' })
+    doc.moveDown()
+    doc.fontSize(10)
+    doc.list(groups, listOptions)
+    doc.moveDown()
+
+    doc.fontSize(14)
+    doc.text('Attendees', { align: 'center' })
+    doc.moveDown()
+    doc.fontSize(10)
+    doc.list(attendees, listOptions)
+
     doc.end()
   }
 })

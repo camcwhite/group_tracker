@@ -100,8 +100,8 @@ export const generateReport = (sessions: SessionInfo[], startDateStr: string, en
 
   return {
     reportDate: new Date(),
-    reportStartDate: new Date(Date.parse(startDateStr)),
-    reportEndDate: new Date(Date.parse(endDateStr)),
+    reportStartDate: new Date(Date.parse(startDateStr + 'CST')),
+    reportEndDate: new Date(Date.parse(endDateStr + 'CST')),
     uniquePeople: people.size,
     uniqueGroups: groups.size,
     numberOfSessions: sessions.length,
@@ -125,5 +125,73 @@ export const generateReport = (sessions: SessionInfo[], startDateStr: string, en
       }
     }),
     people: [...people.values()],
+  };
+};
+
+const dateOptions: {
+  timeZone: 'US/Central',
+  day: 'numeric',
+  year: 'numeric',
+  month: 'long',
+} = {
+  timeZone: 'US/Central',
+  day: 'numeric',
+  year: 'numeric',
+  month: 'long',
+};
+
+const timeOptions: {
+  timeZone: 'US/Central',
+  hour: 'numeric',
+  minute: '2-digit',
+} = {
+  timeZone: 'US/Central',
+  hour: 'numeric',
+  minute: '2-digit',
+};
+
+const getFormattedDate = (date: Date): string => {
+  return date.toLocaleDateString('en-US', dateOptions);
+};
+
+const getFormattedTime = (date: Date): string => {
+  return date.toLocaleTimeString('en-US', timeOptions);
+};
+
+type ReportText = {
+  title: string,
+  mainText: string[],
+  groups: (string | string[])[][],
+  attendees: string[],
+};
+
+export const getReportText = (report: ReportDataType): ReportText => {
+  return {
+    title: `River City Advocacy Peer Support Participants Report`,
+    mainText: [
+      `Generated on ${getFormattedDate(report.reportDate)} at ${getFormattedTime(report.reportDate)}`,
+      `Time Period: ${getFormattedDate(report.reportStartDate)} to ${getFormattedDate(report.reportEndDate)}`,
+      `Number of unique people: ${report.uniquePeople}`,
+      `Number of groups: ${report.uniqueGroups} `,
+      `Number of sessions: ${report.numberOfSessions} `,
+      `Number of total hours: ${report.numberOfHours} `,
+      `Average attendance per session: ${report.averageAttendance} `,
+      `Average session duration: ${report.averageSessionDuration} hour${report.averageSessionDuration !== 1 ? 's' : ''} `,
+    ],
+    groups: [
+      ...report.groups.map(groupInfo => [
+        `${groupInfo.groupName}:`, [
+          `Number of unique people: ${groupInfo.uniquePeople}`,
+          `Number of sessions: ${groupInfo.numberOfSessions}`,
+          `Number of total hours: ${groupInfo.numberOfHours}`,
+          `Average attendance per session: ${groupInfo.averageAttendance}`,
+          `Average session duration: ${groupInfo.averageSessionDuration} hour${groupInfo.averageSessionDuration !== 1 ? 's' : ''}`,
+        ]
+      ]),
+    ],
+    attendees: [
+      ...report.people.map(({personName, numberOfSessions, numberOfHours}) => 
+        `${personName}, ${numberOfSessions} session${numberOfSessions > 1 ? 's' : ''},  ${numberOfHours} hour${numberOfHours !== 1 ? 's' : ''}`),
+    ],
   };
 };
