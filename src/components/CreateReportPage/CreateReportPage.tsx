@@ -1,6 +1,5 @@
-import ReactPDF, { PDFViewer } from "@react-pdf/renderer";
 import React, { useState } from "react";
-import { generatePDF, generateReport } from "../../reports";
+import { generateReport } from "../../reports";
 import { getDateStr, getSessionsBetween, getTodayStr, oneMonthAgo } from "../../sessions";
 import './CreateReportPage.css';
 
@@ -8,15 +7,17 @@ const CreateReportPage = () => {
 
   const [startDate, setStartDate] = useState(getDateStr(oneMonthAgo()));
   const [endDate, setEndDate] = useState(getTodayStr());
-  const [PDFReport, setPDFReport] = useState<() => JSX.Element>()
 
   const createPDF = () => {
     const report = generateReport(getSessionsBetween(startDate, endDate), startDate, endDate);
-    console.log(report);
+    // console.log(report);
     // const PDFReport = generatePDF(report);
-    setPDFReport(generatePDF(report));
     // ReactPDF.renderToFile(PDFReport, './report.pdf');
     // ReactPDF.render(PDFReport, `${__dirname}/report.pdf`);
+    window.postMessage({
+      type: 'savePDF',
+      data: report,
+    })
   };
 
   const createTXT = () => {

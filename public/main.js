@@ -1,12 +1,17 @@
-const { app, BrowserWindow, ipcMain, session, shell } = require('electron')
+const { app, BrowserWindow, ipcMain, session, shell, dialog } = require('electron')
 const Store = require('electron-store')
+
+const fs = require('fs')
+const PDFDocument = require('pdfkit')
 
 Store.initRenderer()
 
 require('@electron/remote/main').initialize()
 
+let browserWindow;
+
 function createWindow() {
-  const win = new BrowserWindow({
+  browserWindow = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
@@ -16,12 +21,12 @@ function createWindow() {
       preload: `${__dirname}/preload.js`,
     },
   })
-  win.maximize()
-  win.webContents.setWindowOpenHandler(({ url }) => {
+  browserWindow.maximize()
+  browserWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url)
     return { action: 'deny' }
   });
-  win.loadURL('http://localhost:3000')
+  browserWindow.loadURL('http://localhost:3000')
 }
 
 app.whenReady().then(() => {
@@ -35,7 +40,7 @@ app.whenReady().then(() => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
-        'Content-Security-Policy': ["unsafe-eval"]
+        'Content-Security-Policy': ["script-src 'self'"]
       }
     })
   })
@@ -46,4 +51,19 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
 
-ipcMain.on('quit', () => app.quit());
+ipcMain.on('quitApp', () => app.quit())
+
+ipcMain.on('savePDF', async (_, args) => {
+  const report = args[0];
+  const doc = new PDFDocument()
+  const {canceled, filePath} = await dialog.showSaveDialog(browserWindow, {
+    title: 'Save PDF Report',
+    defaultPath: app.getAppPath(),
+  }) 
+  if (!canceled) {
+    const stream = fs.createWriteStream(filePath)  
+    doc.pipe(stream)
+    doc.text("Hello World", 100, 100)
+    doc.end()
+  }
+})

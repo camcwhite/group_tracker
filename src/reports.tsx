@@ -1,5 +1,4 @@
 import { SessionInfo } from "./sessions";
-import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
 
 type GroupInfo = {
@@ -128,73 +127,32 @@ export const generateReport = (sessions: SessionInfo[], startDateStr: string, en
   };
 };
 
-export const generatePDF = (report: ReportDataType): () => JSX.Element => {
-  const dateOptions: {
-    timeZone: 'US/Eastern',
-    day: 'numeric',
-    year: 'numeric',
-    month: 'long',
-  } = {
-    timeZone: 'US/Eastern',
-    day: 'numeric',
-    year: 'numeric',
-    month: 'long',
-  };
+// export const generatePDF = (report: ReportDataType): PDFKit.PDFDocument => {
+//   const dateOptions: {
+//     timeZone: 'US/Eastern',
+//     day: 'numeric',
+//     year: 'numeric',
+//     month: 'long',
+//   } = {
+//     timeZone: 'US/Eastern',
+//     day: 'numeric',
+//     year: 'numeric',
+//     month: 'long',
+//   };
 
-  const timeOptions: {
-    timeZone: 'US/Eastern',
-    hour: 'numeric',
-    minute: '2-digit',
-  } = {
-    timeZone: 'US/Eastern',
-    hour: 'numeric',
-    minute: '2-digit',
-  };
+//   const timeOptions: {
+//     timeZone: 'US/Eastern',
+//     hour: 'numeric',
+//     minute: '2-digit',
+//   } = {
+//     timeZone: 'US/Eastern',
+//     hour: 'numeric',
+//     minute: '2-digit',
+//   };
 
-  const getFormattedDate = (date: Date): string => {
-    return date.toLocaleDateString('en-US', dateOptions);
-  };
-
-  const getFormattedTime = (date: Date): string => {
-    return date.toLocaleTimeString('en-US', dateOptions);
-  };
-
-  return () => (
-    <Document>
-      <Page>
-        <View>
-          <Text>
-            River City Advocacy Peer Support Participants Report
-          </Text>
-        </View>
-        <View>
-          <Text>
-            Generated on {getFormattedDate(report.reportDate)} at {getFormattedTime(report.reportDate)}
-          </Text>
-          <Text>
-            Time Period: {getFormattedDate(report.reportStartDate)} to {getFormattedDate(report.reportEndDate)}
-          </Text>
-          <Text>Number of unique people: {report.uniquePeople}</Text>
-          <Text>Number of groups: {report.uniqueGroups}</Text>
-          <Text>Number of sessions: {report.numberOfSessions}</Text>
-          <Text>Number of total hours: {report.numberOfHours}</Text>
-          <Text>Average attendance per session: {report.averageAttendance}</Text>
-          <Text>Average session duration: {report.averageSessionDuration} hours</Text>
-        </View>
-        <View>
-          <Text>Groups:</Text>
-          {report.groups.map((groupInfo, index) => (
-            <View>
-              <Text>  {groupInfo.groupName}</Text>
-              <Text>Number of unique people: {groupInfo.uniquePeople}</Text>
-              <Text>Number of sessions: {groupInfo.numberOfSessions}</Text>
-              <Text>Number of total hours: {groupInfo.numberOfHours}</Text>
-              <Text>Average attendance per session: {groupInfo.averageAttendance}</Text>
-              <Text>Average session duration: {groupInfo.averageSessionDuration} hours</Text>
-            </View>
-          ))}
-        </View>
-      </Page>
-    </Document>
-  );
-};
+//   const doc = new PDFDocument();
+//   doc
+//     .fontSize(25)
+//     .text('Hello World!', 100, 100);
+//   return doc;
+// }
