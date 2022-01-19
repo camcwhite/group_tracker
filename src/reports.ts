@@ -1,4 +1,5 @@
 import { SessionInfo } from "./sessions";
+import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 
 
 type GroupInfo = {
@@ -126,33 +127,3 @@ export const generateReport = (sessions: SessionInfo[], startDateStr: string, en
     people: [...people.values()],
   };
 };
-
-// export const generatePDF = (report: ReportDataType): PDFKit.PDFDocument => {
-//   const dateOptions: {
-//     timeZone: 'US/Eastern',
-//     day: 'numeric',
-//     year: 'numeric',
-//     month: 'long',
-//   } = {
-//     timeZone: 'US/Eastern',
-//     day: 'numeric',
-//     year: 'numeric',
-//     month: 'long',
-//   };
-
-//   const timeOptions: {
-//     timeZone: 'US/Eastern',
-//     hour: 'numeric',
-//     minute: '2-digit',
-//   } = {
-//     timeZone: 'US/Eastern',
-//     hour: 'numeric',
-//     minute: '2-digit',
-//   };
-
-//   const doc = new PDFDocument();
-//   doc
-//     .fontSize(25)
-//     .text('Hello World!', 100, 100);
-//   return doc;
-// }
