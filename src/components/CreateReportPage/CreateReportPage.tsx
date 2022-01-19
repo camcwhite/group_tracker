@@ -14,6 +14,19 @@ const CreateReportPage = () => {
     window.postMessage({ type, data })
   };
 
+  const navigate = useNavigate();
+  const handleSaveDone = ({data}: {data: any}) => {
+    console.log(data);
+    if (data.type === 'save-done' && data.status === 'ok') {
+      navigate('/'); 
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('message', handleSaveDone);
+    return () => window.removeEventListener('message', handleSaveDone);
+  }, []);
+
   const createPDF = () => {
     const reportText = getReportText(getReport());
     doSave('savePDF', reportText);
