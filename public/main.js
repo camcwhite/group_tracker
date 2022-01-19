@@ -75,7 +75,7 @@ const getFormattedTime = (date) => {
   return date.toLocaleTimeString('en-US', dateOptions);
 }
 
-ipcMain.on('savePDF', async (_, { title, mainText, groups, attendees }) => {
+ipcMain.on('savePDF', async (event, { title, mainText, groups, attendees }) => {
   const { canceled, filePath } = await dialog.showSaveDialog(browserWindow, {
     title: 'Save PDF Report',
     defaultPath: path.join(app.getAppPath(), 'report.pdf'),
@@ -113,10 +113,11 @@ ipcMain.on('savePDF', async (_, { title, mainText, groups, attendees }) => {
     doc.list(attendees, listOptions)
 
     doc.end()
+    event.reply('save-done', { status: 'ok' })
   }
 })
 
-ipcMain.on('saveTXT', async (_, { title, mainText, groups, attendees }) => {
+ipcMain.on('saveTXT', async (event, { title, mainText, groups, attendees }) => {
   const { canceled, filePath } = await dialog.showSaveDialog(browserWindow, {
     title: 'Save TXT Report',
     defaultPath: path.join(app.getAppPath(), 'report.txt'),
@@ -129,7 +130,30 @@ ipcMain.on('saveTXT', async (_, { title, mainText, groups, attendees }) => {
 
     fs.writeFile(filePath, content, err => {
       if (err) {
-        console.error(err)
+        event.reply('save-done', { status: 'error', error: err })
+      }
+      else {
+        event.reply('save-done', { status: 'ok' })
+      }
+    })
+  }
+})
+
+ipcMain.on('saveCSV', async (event, lines) => {
+  const { canceled, filePath } = await dialog.showSaveDialog(browserWindow, {
+    title: 'Save CSV Data',
+    defaultPath: path.join(app.getAppPath(), 'report.csv'),
+    filters: [{ name: 'CSV File (.csv)', extensions: ['csv'] }]
+  })
+  if (!canceled) {
+    let content = lines.join('\n')
+
+    fs.writeFile(filePath, content, err => {
+      if (err) {
+        event.reply('save-done', { status: 'error', error: err })
+      }
+      else {
+        event.reply('save-done', { status: 'ok' })
       }
     })
   }

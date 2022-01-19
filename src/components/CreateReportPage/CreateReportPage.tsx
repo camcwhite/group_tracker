@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { generateReport, getReportText } from "../../reports";
+import { generateReport, getAttendeeCSVText, getGroupCSVText, getReportText } from "../../reports";
 import { getDateStr, getSessionsBetween, getTodayStr, oneMonthAgo } from "../../sessions";
 import './CreateReportPage.css';
 
@@ -25,12 +25,12 @@ const CreateReportPage = () => {
     doSave('saveTXT', reportText);
   };
 
-  const createGroupXLSX = () => {
-
+  const createGroupCSV = () => {
+    doSave('saveCSV', getGroupCSVText(getReport().groups));
   };
 
-  const createAttendeeXLSX = () => {
-
+  const createAttendeeCSV = () => {
+    doSave('saveCSV', getAttendeeCSVText(getReport().people));
   };
 
   return (
@@ -56,8 +56,8 @@ const CreateReportPage = () => {
         <div className="create-form-buttons">
           <button onClick={createPDF}>PDF</button>
           <button onClick={createTXT}>Text File</button>
-          <button onClick={createGroupXLSX}>Group Data (Excel)</button>
-          <button onClick={createAttendeeXLSX}>Attendee Data (Excel)</button>
+          <button onClick={createGroupCSV}>Group Data (CSV)</button>
+          <button onClick={createAttendeeCSV}>Attendee Data (CSV)</button>
         </div>
       </form>
     </div>

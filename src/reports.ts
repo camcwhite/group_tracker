@@ -195,3 +195,28 @@ export const getReportText = (report: ReportDataType): ReportText => {
     ],
   };
 };
+
+/**
+type GroupReportType = {
+    groupName: string;
+    uniquePeople: number;
+    numberOfSessions: number;
+    numberOfHours: number;
+    averageAttendance: number;
+    averageSessionDuration: number;
+}
+ */
+
+export const getGroupCSVText = (groups: GroupReportType[]): string[] => {
+  return [
+    'Group Name,Unique People,Sessions,Hours,Avg Attendance,Avg Session Duration (hours)',
+    ...groups.map(group => [...Object.values(group)].map(value => value).join(',')), 
+  ];
+};
+
+export const getAttendeeCSVText = (attendees: PersonReportType[]): string[] => {
+  return [
+    'Name,Sessions,Hours',
+    ...attendees.map(person => [...Object.values(person)].map(value => value).join(',')), 
+  ];
+};

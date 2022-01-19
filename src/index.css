@@ -80,3 +80,12 @@ button {
   align-items: center;
   justify-content: flex-start;
 }
+
+.info-text {
+  color: var(--font-primary);
+  font-size: clamp(.5vw, 4rem, 2vw);
+}
+
+.error-text {
+  color: red,
+}
