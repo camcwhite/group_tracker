@@ -24,7 +24,7 @@ enum SortState {
 const getNextSortState = (sortState: SortState): SortState => {
   switch (sortState) {
     case SortState.NEUTRAL:
-      return SortState.INCREASING; 
+      return SortState.INCREASING;
     case SortState.INCREASING:
       return SortState.DECREASING;
     case SortState.DECREASING:
@@ -39,7 +39,7 @@ const getNextSortState = (sortState: SortState): SortState => {
 // ])
 
 const SORT_CHARS = new Map<SortState, string>([
-  [SortState.NEUTRAL,'-'],
+  [SortState.NEUTRAL, '-'],
   [SortState.INCREASING, '\u25b2'],
   [SortState.DECREASING, '\u25bc'],
 ]);
@@ -124,7 +124,7 @@ const SessionSearchPage = () => {
     const currentSession = saveSessionRef.current;
     if (currentSession !== undefined) {
       saveSession(currentSession);
-      setSessions(sessions.filter(({sessionID}) => sessionID !== currentSession.sessionID).concat(currentSession));
+      setSessions(sessions.filter(({ sessionID }) => sessionID !== currentSession.sessionID).concat(currentSession));
       setEditingSession(undefined);
     }
   };
@@ -132,7 +132,7 @@ const SessionSearchPage = () => {
   const doDelete = () => {
     if (editingSession !== undefined) {
       deleteSession(editingSession.sessionID)
-      setSessions(sessions.filter(({sessionID}) => sessionID !== editingSession.sessionID))
+      setSessions(sessions.filter(({ sessionID }) => sessionID !== editingSession.sessionID))
       setEditingSession(undefined);
     }
   };
@@ -141,16 +141,16 @@ const SessionSearchPage = () => {
     let diff = false;
     if (editingSession) {
       diff = sessionInfo.groupName !== editingSession.groupName ||
-              sessionInfo.dateStr !== editingSession.dateStr ||
-              sessionInfo.duration !== editingSession.duration ||
-              sessionInfo.participants.length !== editingSession.participants.length ||
-              sessionInfo.participants.reduce(
-                (soFar: boolean, participant, index) => 
-                  soFar || (participant !== editingSession.participants[index]), false);
+        sessionInfo.dateStr !== editingSession.dateStr ||
+        sessionInfo.duration !== editingSession.duration ||
+        sessionInfo.participants.length !== editingSession.participants.length ||
+        sessionInfo.participants.reduce(
+          (soFar: boolean, participant, index) =>
+            soFar || (participant !== editingSession.participants[index]), false);
     }
 
     if (diff) {
-      setConfirmModalState(ModalState.CONFIRM_BACK); 
+      setConfirmModalState(ModalState.CONFIRM_BACK);
     }
     else {
       doBack();
@@ -170,18 +170,18 @@ const SessionSearchPage = () => {
   ]);
 
   const sortButton = (sortState: SortState, setSortState: (sortState: SortState) => void) => (
-    <button 
+    <button
       onClick={() => setSortState(getNextSortState(sortState))}
     >
       <div className="session-list-header-sort-container">
-        <p 
+        <p
           className={
             sortState !== SortState.DECREASING ? 'sort-button-showing' : 'sort-button-hiding'
           }
         >
           {"\u25b2"}
         </p>
-        <p 
+        <p
           className={
             sortState !== SortState.INCREASING ? 'sort-button-showing' : 'sort-button-hiding'
           }
@@ -254,33 +254,35 @@ const SessionSearchPage = () => {
           >
             Reset Filters
           </button>
-          <div className="session-list-container">
-            <div className="session-list-header-section">
-              <div className="session-list-header">
-                <p>Group Name:</p>
-                {sortButton(groupSortState, setGroupSortState)}
+          {sessions.length === 0 ? (<h3>No Saved Sessions</h3>) : (
+            <div className="session-list-container">
+              <div className="session-list-header-section">
+                <div className="session-list-header">
+                  <p>Group Name:</p>
+                  {sortButton(groupSortState, setGroupSortState)}
+                </div>
+                <div className="session-list-header">
+                  <p>Date:</p>
+                  {sortButton(dateSortState, setDateSortState)}
+                </div>
+                <div className="session-list-header">
+                  <p>Duration (hours):</p>
+                  {sortButton(durationSortState, setDurationSortState)}
+                </div>
               </div>
-              <div className="session-list-header">
-                <p>Date:</p>
-                {sortButton(dateSortState, setDateSortState)}
-              </div>
-              <div className="session-list-header">
-                <p>Duration (hours):</p>
-                {sortButton(durationSortState, setDurationSortState)}
-              </div>
+              {sessions.filter(filterSessionInfo).sort(sortSessionInfo).map(sessionInfo => (
+                <div
+                  key={sessionInfo.sessionID}
+                  className="button session-list-item"
+                  onClick={() => setEditingSession(sessionInfo)}
+                >
+                  <p>{sessionInfo.groupName}</p>
+                  <p>{sessionInfo.dateStr}</p>
+                  <p>{sessionInfo.duration}</p>
+                </div>
+              ))}
             </div>
-            {sessions.filter(filterSessionInfo).sort(sortSessionInfo).map(sessionInfo => (
-              <div
-                key={sessionInfo.sessionID}
-                className="button session-list-item"
-                onClick={() => setEditingSession(sessionInfo)}
-              >
-                <p>{sessionInfo.groupName}</p>
-                <p>{sessionInfo.dateStr}</p>
-                <p>{sessionInfo.duration}</p>
-              </div>
-            ))}
-          </div>
+          )}
         </motion.div>
       ) : (
         <motion.div

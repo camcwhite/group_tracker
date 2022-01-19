@@ -26,7 +26,6 @@ const store = new Store<StoreSchemaType>({
     participantNames: new Array<string>(),
   }
 });
-store.clear();
 
 export const storeGet = (key: keyof StoreSchemaType): SessionInfo[] | string[] | string => {
   return store.get(key);
