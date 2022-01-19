@@ -8,6 +8,10 @@
   font-size: clamp(1vw, 2rem, 3vw);
 }
 
+.search-drop-down {
+  height: 50px;
+}
+
 .SessionForm > form > label > input {
   text-align: right;
 }
