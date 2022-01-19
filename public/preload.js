@@ -4,6 +4,12 @@ window.addEventListener('message', ({data}) => {
   ipcRenderer.send(data.type, data.data);
 });
 
+const sendReply = (type, data) => window.postMessage({type, ...data})
+
 ipcRenderer.on('save-done', (_, data) => {
-  window.postMessage({type: 'save-done', ...data})
+  sendReply('save-done', data)
+})
+
+ipcRenderer.on('upload-done', (_, data) => {
+  sendReply('upload-done', data)
 })

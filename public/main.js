@@ -158,3 +158,24 @@ ipcMain.on('saveCSV', async (event, lines) => {
     })
   }
 })
+
+ipcMain.on('upload-legacy-data', async (event) => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, {
+    title: 'Upload Legacy Data File',
+    defaultPath: app.getAppPath(),
+    filters: [{ name: 'Legacy Data File (.json)', extensions: ['json'] }],
+    buttonLabel: 'Upload',
+    properties: ['openFile'],
+  })
+  if (!canceled || filePaths.length < 1) {
+    fs.readFile(filePaths[0], (err, data) => {
+      if (err) {
+        event.reply('upload-done', { status: 'error', error: err })
+      }
+      else {
+        const upload_data = JSON.parse(data);
+        event.reply('upload-done', { status: 'ok', data: upload_data })
+      }
+    })
+  }
+})

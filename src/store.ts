@@ -2,40 +2,10 @@ import Store, { Schema } from 'electron-store';
 import { SessionInfo } from './sessions';
 
 export type StoreSchemaType = {
+  version: string,
   sessions: SessionInfo[],
   groupNames: string[],
   participantNames: string[],
-}
-
-const storeSchema: Schema<StoreSchemaType> = {
-  sessions: {
-    type: 'array',
-    items: {
-      type: 'object',
-      properties: {
-        sessionID: { type: 'string' },
-        groupName: { type: 'string' },
-        dateStr: { type: 'string' },
-        duration: { type: 'number' },
-        participants: { 
-          type: 'array', 
-          items: { type: 'string' },
-        },
-      }
-    }
-  },
-  groupNames: {
-    type: 'array',
-    items: {
-      type: 'string',
-    }
-  },
-  participantNames: {
-    type: 'array',
-    items: {
-      type: 'string',
-    }
-  }
 }
 
 export const STORE_KEYS: {
@@ -50,16 +20,19 @@ export const STORE_KEYS: {
 
 const store = new Store<StoreSchemaType>({
   defaults: {
+    version: '0.2.0',
     sessions: new Array<SessionInfo>(), 
     groupNames: new Array<string>(),
     participantNames: new Array<string>(),
   }
 });
 
-export const storeGet = (key: keyof StoreSchemaType): SessionInfo[] | string[] => {
+export const storeGet = (key: keyof StoreSchemaType): SessionInfo[] | string[] | string => {
   return store.get(key);
 };
 
 export const storeSet = (key: string, value: any): void => {
   store.set(key, value);
 };
+
+export const storeObj = () => store.store;
