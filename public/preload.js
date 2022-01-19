@@ -13,3 +13,7 @@ ipcRenderer.on('save-done', (_, data) => {
 ipcRenderer.on('upload-done', (_, data) => {
   sendReply('upload-done', data)
 })
+
+ipcRenderer.on('export-done', (_, data) => {
+  sendReply('export-done', data)
+})

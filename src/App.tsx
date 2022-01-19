@@ -9,6 +9,7 @@ import AddSessionPage from "./components/AddSessionPage/AddSessionPage";
 import EditSessionPage from "./components/EditSessionPage/EditSessionPage";
 import SessionSearchPage from "./components/SessionSearchPage/SessionSearchPage";
 import CreateReportPage from "./components/CreateReportPage/CreateReportPage";
+import ManageDataPage from "./components/ManageDataPage/ManageDataPage";
 
 const TransitionPage = (PageElement: () => JSX.Element, props?: JSX.IntrinsicAttributes): JSX.Element => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
           <Route path='/add-session' element={TransitionPage(AddSessionPage)} />
           <Route path='/edit-sessions' element={TransitionPage(SessionSearchPage)} />
           <Route path='/create-report' element={TransitionPage(CreateReportPage)} />
+          <Route path='/manage-data' element={TransitionPage(ManageDataPage)} />
         </Routes>
       </AnimatePresence>
     </div>

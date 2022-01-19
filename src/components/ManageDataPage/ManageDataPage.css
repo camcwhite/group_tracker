@@ -1,0 +1,12 @@
+.ManageDataPage {
+  gap: 20px;
+}
+
+.ManageDataPage > button {
+  width: 40%;
+  max-width: 300px;
+}
+
+.ManageDataPage > button:hover {
+  padding: 0 24px;
+}

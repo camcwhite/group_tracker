@@ -8,6 +8,7 @@ const homeButtons = new Map([
   ['Add Group Sessions', '/add-session'],
   ['Edit Group Sessions', '/edit-sessions'],
   ['Create Report', '/create-report'],
+  ['Manage Data', '/manage-data'],
   ['About', '/about'],
 ])
 

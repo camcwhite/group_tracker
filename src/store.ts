@@ -21,11 +21,12 @@ export const STORE_KEYS: {
 const store = new Store<StoreSchemaType>({
   defaults: {
     version: '0.2.0',
-    sessions: new Array<SessionInfo>(), 
+    sessions: new Array<SessionInfo>(),
     groupNames: new Array<string>(),
     participantNames: new Array<string>(),
   }
 });
+store.clear();
 
 export const storeGet = (key: keyof StoreSchemaType): SessionInfo[] | string[] | string => {
   return store.get(key);
@@ -36,3 +37,41 @@ export const storeSet = (key: string, value: any): void => {
 };
 
 export const storeObj = () => store.store;
+
+export const parseLegacyData = (data: any): SessionInfo[] | undefined => {
+  type LegacySession = {
+    GROUP_NAME: string,
+    DATE: string,
+    DURATION_HOURS: string,
+    ATTENDEES: string[],
+  };
+  let legacy_sessions;
+  try {
+    legacy_sessions = data.SESSIONS as Array<LegacySession>;
+  }
+  catch (e) {
+    console.error('Malformed session data', data);
+    return undefined;
+  }
+  return legacy_sessions.map(session => {
+    return {
+      sessionID: '',
+      groupName: session.GROUP_NAME,
+      dateStr: session.DATE,
+      duration: parseFloat(session.DURATION_HOURS),
+      participants: session.ATTENDEES,
+    }
+  });
+};
+
+export const parseData = (data: any): SessionInfo[] | undefined => {
+  let sessions;
+  try {
+    sessions = data.sessions as Array<SessionInfo>;
+  }
+  catch (e) {
+    console.error('Malformed session data', data);
+    return undefined;
+  }
+  return sessions;
+};

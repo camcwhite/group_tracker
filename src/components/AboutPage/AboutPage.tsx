@@ -1,49 +1,7 @@
-import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React from 'react';
 import './AboutPage.css';
-import { saveSession } from '../../sessions';
-import { storeObj } from '../../store';
 
 const AboutPage = () => {
-
-  const handleUploadLegacyData = () => {
-    window.postMessage({ type: "upload-legacy-data", data: null });
-  };
-
-  const handleUploadDone = ({data}: {data: any}) => {
-    if (data.type === 'upload-done' && data.status === 'ok') {
-      if (data.data.SESSIONS === undefined) {
-        console.error('Malformed legacy data');
-        return;
-      }
-      data.data.SESSIONS.forEach((session: any)=> {
-        if (
-          session.GROUP_NAME === undefined ||
-          session.DATE === undefined ||
-          session.DURATION_HOURS === undefined ||
-          session.ATTENDEES === undefined
-        ) {
-          console.error('Malformed session');
-          return;
-        }
-        saveSession({
-          sessionID: '',
-          groupName: session.GROUP_NAME,
-          dateStr: session.DATE,
-          duration: session.DURATION_HOURS,
-          participants: session.ATTENDEES, 
-        });
-      })
-    }
-  };
-
-  console.log(storeObj());
-
-  useEffect(() => {
-    window.addEventListener('message', handleUploadDone);
-    return () => window.removeEventListener('message', handleUploadDone);
-  }, [])
-
   return (
     <div className="page AboutPage">
       <h2>About</h2>
@@ -99,13 +57,6 @@ const AboutPage = () => {
           </ul>
         </li>
       </ul>
-
-      <button
-        onClick={handleUploadLegacyData}
-        className='small-button'
-      >
-        Upload Legacy Data
-      </button>
 
       <small>v0.2.0</small>
     </div>

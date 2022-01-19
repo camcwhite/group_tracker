@@ -174,7 +174,47 @@ ipcMain.on('upload-legacy-data', async (event) => {
       }
       else {
         const upload_data = JSON.parse(data);
+        event.reply('upload-done', { status: 'ok', data: upload_data, legacy: true })
+      }
+    })
+  }
+})
+
+ipcMain.on('upload-data', async (event) => {
+  const { canceled, filePaths } = await dialog.showOpenDialog(browserWindow, {
+    title: 'Upload Data File',
+    defaultPath: app.getAppPath(),
+    filters: [{ name: 'Data File (.json)', extensions: ['json'] }],
+    buttonLabel: 'Upload',
+    properties: ['openFile'],
+  })
+  if (!canceled || filePaths.length < 1) {
+    fs.readFile(filePaths[0], (err, data) => {
+      if (err) {
+        event.reply('upload-done', { status: 'error', error: err })
+      }
+      else {
+        const upload_data = JSON.parse(data);
         event.reply('upload-done', { status: 'ok', data: upload_data })
+      }
+    })
+  }
+})
+
+ipcMain.on('export-data', async (event, data) => {
+  const { canceled, filePath } = await dialog.showSaveDialog(browserWindow, {
+    title: 'Export Data File',
+    defaultPath: app.getAppPath(),
+    filters: [{ name: 'Data File (.json)', extensions: ['json'] }],
+    buttonLabel: 'Save',
+  })
+  if (!canceled || filePaths.length < 1) {
+    fs.writeFile(filePath, JSON.stringify(data), err => {
+      if (err) {
+        event.reply('export-done', { status: 'error', error: err })
+      }
+      else {
+        event.reply('export-done', { status: 'ok' })
       }
     })
   }
