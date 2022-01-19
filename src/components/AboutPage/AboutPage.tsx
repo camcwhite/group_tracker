@@ -79,6 +79,9 @@ const AboutPage = () => {
             <li>
               Click 'Upload Legacy Data' and select a file to upload data that was exported from the older (Python) version of the app.
             </li>
+            <li>
+              If the upload was successful you will be returned to the main menu. If this does not happen, there was an error reading the file.
+            </li>
           </ul>
         </li>
       </ul>
