@@ -26,7 +26,7 @@ const AboutPage = () => (
             Click 'Add Group Session' from the main menu and enter information for that session.
           </li>
           <li>
-            Participants can either be entered one at a time using the text box next to 'Participants' (press Enter to add a name) or pasted/edited in the text box below 'Participants'.
+            Participants can either be entered one at a time using the text box next to 'Participants' (press Enter to add a name) or edited in a text box below 'Participants'.
           </li>
         </ul>
       </li>
@@ -34,13 +34,13 @@ const AboutPage = () => (
         To edit a session record:
         <ul>
           <li>
-            Click 'Edit Group Sessions' from the main menu. Select which record to edit using the 'Prev' and 'Next' buttons at the top of the page.
+            Click 'Edit Group Sessions' from the main menu. Select which record to edit using filter/sort options and click on that record to edit it. 
           </li>
           <li>
             When you are done editing a session, click 'Save' to save your changes.
           </li>
           <li>
-            To delete a record click 'Delete' at the bottom of the page (warning: there is no warning after clicking, the record is immediately deleted).
+            To delete a record click 'Delete' at the bottom of the page.
           </li>
         </ul>
       </li>
@@ -51,16 +51,16 @@ const AboutPage = () => (
             Click 'Create Report' from the main menu.
           </li>
           <li>
-            Enter start date in YYYY-MM-DD format (example: 2021-09-12 for September 12, 2021)
-          </li>
-          <li>
-            Enter end date in YYYY-MM-DD format
+            Enter start and end date for the report. The report will be generated from all saved sessions between the start and end date.
           </li>
           <li>
             Click 'PDF' to save report to a PDF (.pdf) file (after choosing a save location and file name)
           </li>
           <li>
             Click 'Text' to save report to a text (.txt) file (after choosing a save location and file name)
+          </li>
+          <li>
+            Click either of the CSV options to generate a CSV file that can be imported to Excel or Google Sheets
           </li>
         </ul>
       </li>
