@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --port 3000",
-    "build": "SET NODE_ENV=production && webpack",
+    "build": "NODE_ENV=production && webpack",
     "electron-dev": "concurrently -k \"cross-env BROWSER=none npm run start\" \" npm run electron-start\"",
     "electron-build": "npm run build && electron-builder -c.extraMetadata.main=build/main.js",
     "electron-start": "wait-on tcp:3000 && electron ."
