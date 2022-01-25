@@ -28,11 +28,10 @@ function createWindow() {
     shell.openExternal(url)
     return { action: 'deny' }
   });
-  // browserWindow.loadURL('http://localhost:3000')
   browserWindow.loadURL(
     isDev
       ? 'http://localhost:3000'
-      : `file://${path.join(__dirname, '../build/index.html')}`
+      : `file://${path.join(__dirname, '../dist/index.html')}`
   )
 }
 
