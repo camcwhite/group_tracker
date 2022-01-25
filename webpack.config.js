@@ -7,9 +7,7 @@ module.exports = {
   mode: prod ? 'production' : 'development',
   entry: './src/index.tsx',
   output: {
-    path: prod ? __dirname + '/build/' : __dirname + '/dist/',
-    // path: __dirname + '/build/',
-    publicPath: './'
+    path: __dirname + (prod ? '/build/' : '/dist/'),
   },
   module: {
     rules: [
